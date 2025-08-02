@@ -1,0 +1,15 @@
+{% extends "boards/base.html" %}
+
+{% block content %}
+  <h1>Quadros</h1>
+
+  <ul>
+    {% for board in boards %}
+      <li><a href="{% url 'boards:detail' board.pk %}">{{ board.title }}</a></li>
+    {% empty %}
+      <li>Não há quadros ainda.</li>
+    {% endfor %}
+  </ul>
+
+  <p><a class="btn" href="{% url 'boards:create_board' %}">+ Novo quadro</a></p>
+{% endblock %}
