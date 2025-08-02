@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <title>Kanban</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <style>
+    body { font-family: system-ui, Arial, sans-serif; margin: 0; padding: 16px; background: #f0f2f5; }
+    .container { max-width: 1000px; margin: auto; }
+    nav a { margin-right: 12px; text-decoration: none; color: #2563eb; }
+    .flex { display: flex; gap: 16px; align-items: flex-start; }
+    .column { background: #ffffff; padding: 12px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.08); width: 30%; }
+    .card { background: #f9f9fb; padding: 8px; margin-bottom: 8px; border-radius: 6px; border: 1px solid #e2e8f0; }
+    h1, h2, h3 { margin-top: 0; }
+    form { margin-top: 8px; }
+    .small { font-size: 0.9rem; color: #555; }
+    .btn { padding: 6px 12px; border: none; border-radius: 5px; cursor: pointer; background: #2563eb; color: white; }
+    .input { width: 100%; padding: 6px; margin-bottom: 4px; border: 1px solid #cbd5e1; border-radius: 4px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <nav>
+      <a href="{% url 'boards:list' %}">Quadros</a>
+      <a href="{% url 'boards:create_board' %}">+ Novo quadro</a>
+    </nav>
+    <hr />
+    {% block content %}{% endblock %}
+  </div>
+</body>
+</html>

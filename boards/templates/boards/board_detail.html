@@ -1,0 +1,46 @@
+{% extends "boards/base.html" %}
+
+{% block content %}
+  <h1>{{ board.title }}</h1>
+  <p class="small">{{ board.description }}</p>
+
+  <h2>Colunas</h2>
+  <div class="flex">
+    {% for column in board.columns.all %}
+      <div class="column">
+        <h3>{{ column.title }}</h3>
+        <ul>
+          {% for card in column.cards.all %}
+            <li class="card">
+              <strong>{{ card.title }}</strong>
+              {% if card.is_done %}✓{% endif %}
+              <div class="small">{{ card.description }}</div>
+            </li>
+          {% empty %}
+            <li class="small">Nenhum cartão.</li>
+          {% endfor %}
+        </ul>
+        <!-- form rápido para criar cartão -->
+        <form method="post" action="{% url 'boards:create_card' column.pk %}">
+          {% csrf_token %}
+          <input name="title" placeholder="Título do cartão" class="input" required />
+          <input type="hidden" name="position" value="{{ column.cards.count }}" />
+          <button type="submit" class="btn">+ Novo cartão</button>
+        </form>
+      </div>
+    {% empty %}
+      <p>Sem colunas ainda.</p>
+    {% endfor %}
+
+    <!-- adicionar coluna -->
+    <div class="column">
+      <h3>+ Adicionar coluna</h3>
+      <form method="post" action="{% url 'boards:create_column' board.pk %}">
+        {% csrf_token %}
+        <input name="title" placeholder="Título da coluna" class="input" required />
+        <input type="hidden" name="position" value="{{ board.columns.count }}" />
+        <button type="submit" class="btn">Adicionar</button>
+      </form>
+    </div>
+  </div>
+{% endblock %}
