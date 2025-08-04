@@ -1,3 +1,6 @@
+from django.http import JsonResponse
+from django.views.decorators.http import require_POST
+from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import render, get_object_or_404, redirect
 from django.views.generic import ListView, DetailView
 from .models import Board, Column, Card
@@ -60,3 +63,11 @@ def update_board(request, pk):
         "boards/board_form.html",
         {"form_data": {"title": board.title, "description": board.description}},
     )
+
+
+@require_POST
+def toggle_card_done(request, card_pk):
+    card = get_object_or_404(Card, pk=card_pk)
+    card.is_done = not card.is_done
+    card.save()
+    return JsonResponse({"is_done": card.is_done})

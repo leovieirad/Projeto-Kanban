@@ -1,6 +1,14 @@
 {% extends "boards/base.html" %}
 
 {% block content %}
+
+<style>
+  .card.done {
+    opacity: 0.6;
+    text-decoration: line-through;
+  }
+</style>
+  
   <h1>{{ board.title }}</h1>
   <p class="small">{{ board.description }}</p>
 
@@ -11,8 +19,11 @@
         <h3>{{ column.title }}</h3>
         <ul>
           {% for card in column.cards.all %}
-            <li class="card">
-              <strong>{{ card.title }}</strong>
+            <li class="card" data-card-id="{{ card.pk }}">
+              <label>
+                <input type="checkbox" class="toggle-done" {% if card.is_done %}checked{% endif %}>
+                <strong>{{ card.title }}</strong>
+              </label>
               {% if card.is_done %}✓{% endif %}
               <div class="small">{{ card.description }}</div>
             </li>
@@ -57,4 +68,52 @@
       </form>
     </div>
   </div>
+
+<script>
+  function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== "") {
+      const cookies = document.cookie.split(";");
+      for (let i = 0; i < cookies.length; i++) {
+        const cookie = cookies[i].trim();
+        if (cookie.startsWith(name + "=")) {
+          cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+          break;
+        }
+      }
+    }
+    return cookieValue;
+  }
+  const csrftoken = getCookie("csrftoken");
+
+  document.querySelectorAll(".toggle-done").forEach((checkbox) => {
+    checkbox.addEventListener("change", async (e) => {
+      const li = e.target.closest("li.card");
+      const cardId = li.dataset.cardId;
+      try {
+        const resp = await fetch(
+          `{% url 'boards:toggle_card_done' 0 %}`.replace("/0/", `/${cardId}/`),
+          {
+            method: "POST",
+            headers: {
+              "X-CSRFToken": csrftoken,
+              Accept: "application/json",
+            },
+          }
+        );
+        const data = await resp.json();
+        // <-- aqui é onde vai esse if/else
+        if (data.is_done) {
+          li.classList.add("done");
+        } else {
+          li.classList.remove("done");
+        }
+      } catch (err) {
+        console.error("Erro toggle card:", err);
+      }
+    });
+  });
+</script>
+
+
 {% endblock %}
