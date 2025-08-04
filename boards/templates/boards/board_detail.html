@@ -31,14 +31,14 @@
           <input type="hidden" name="position" value="{{ column.cards.count }}" />
           <button type="submit" class="btn">+ Novo cartão</button>
         </form>
-        <form method="post" action="{% url 'boards:update_board' board.pk %}" style="margin-bottom:16px;">
+        <form method="post" action="{% url 'boards:update_board' board.pk %}">
           {% csrf_token %}
-          <div style="display:flex; gap:12px; align-items:flex-start; flex-wrap:wrap;">
-            <div style="flex:1;">
-              <input name="title" value="{{ board.title }}" class="input" style="font-size:1.5rem; font-weight:600; width:100%;" required />
+          <div>
+            <div>
+              <input name="title" value="{{ board.title }}" class="input" required />
             </div>
-            <div style="flex:2;">
-              <textarea name="description" class="input" placeholder="Descrição" style="width:100%; height:60px;">{{ board.description }}</textarea>
+            <div>
+              <textarea name="description" class="input" placeholder="Descrição" {{ board.description }}</textarea>
             </div>
             <div>
               <button type="submit" class="btn">Salvar</button>
