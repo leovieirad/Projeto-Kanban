@@ -54,4 +54,9 @@ def update_board(request, pk):
             board.description = description
             board.save()
         return redirect("boards:detail", pk=pk)
-    return render(request, "boards/board_form.html", {"form_data": {"title": board.title, "description": board.description}})
+
+    return render(
+        request,
+        "boards/board_form.html",
+        {"form_data": {"title": board.title, "description": board.description}},
+    )
