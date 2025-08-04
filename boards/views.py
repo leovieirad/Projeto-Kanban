@@ -43,3 +43,15 @@ def create_card(request, column_pk):
             position = column.cards.count()
             Card.objects.create(column=column, title=title, position=position)
     return redirect("boards:detail", pk=column.board.pk)
+
+def update_board(request, pk):
+    board = get_object_or_404(Board, pk=pk)
+    if request.method == "POST":
+        title = request.POST.get("title", "").strip()
+        description = request.POST.get("description", "").strip()
+        if title:
+            board.title = title
+            board.description = description
+            board.save()
+        return redirect("boards:detail", pk=pk)
+    return render(request, "boards/board_form.html", {"form_data": {"title": board.title, "description": board.description}})

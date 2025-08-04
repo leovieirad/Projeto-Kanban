@@ -27,6 +27,11 @@
           <input type="hidden" name="position" value="{{ column.cards.count }}" />
           <button type="submit" class="btn">+ Novo cartão</button>
         </form>
+        <form method="post" action="{% url 'boards:update_board' board.pk %}">
+          {% csrf_token %}
+          <input name="title" value="{{ board.title }}" />
+          <button type="submit">Salvar</button>
+        </form>
       </div>
     {% empty %}
       <p>Sem colunas ainda.</p>

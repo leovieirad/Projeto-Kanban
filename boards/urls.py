@@ -5,6 +5,7 @@ from .views import (
     create_board,
     create_column,
     create_card,
+    update_board,
 )
 
 app_name = "boards"
@@ -15,4 +16,6 @@ urlpatterns = [
     path("boards/<int:pk>/", BoardDetailView.as_view(), name="detail"),
     path("boards/<int:board_pk>/colunas/novo/", create_column, name="create_column"),
     path("colunas/<int:column_pk>/cartoes/novo/", create_card, name="create_card"),
+    path("boards/<int:pk>/editar/", update_board, name="update_board"),
+
 ]
