@@ -88,3 +88,7 @@ form {
   height: 60px;
   resize: vertical;
 }
+.done {
+    text-decoration: line-through;
+    opacity: 0.6;
+}

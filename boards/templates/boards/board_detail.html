@@ -97,9 +97,9 @@
         const data = await resp.json();
         // <-- aqui é onde vai esse if/else
         if (data.is_done) {
-          li.classList.add("done");
+            li.classList.add("done");
         } else {
-          li.classList.remove("done");
+            li.classList.remove("done");
         }
       } catch (err) {
         console.error("Erro toggle card:", err);
