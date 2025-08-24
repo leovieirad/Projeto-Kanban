@@ -5,6 +5,22 @@
   <h1>{{ board.title }}</h1>
   <p class="small">{{ board.description }}</p>
 
+  <!-- form para editar quadro (fora do loop de colunas) -->
+  <form method="post" action="{% url 'boards:update_board' board.pk %}" class="mb-4">
+    {% csrf_token %}
+    <div>
+      <div>
+        <input name="title" value="{{ board.title }}" class="input" required />
+      </div>
+      <div>
+        <textarea name="description" class="input" placeholder="Descrição">{{ board.description }}</textarea>
+      </div>
+      <div>
+        <button type="submit" class="btn">Salvar</button>
+      </div>
+    </div>
+  </form>
+
   <h2>Colunas</h2>
   <div class="flex">
     {% for column in board.columns.all %}
@@ -30,20 +46,6 @@
           <input name="title" placeholder="Título do cartão" class="input" required />
           <input type="hidden" name="position" value="{{ column.cards.count }}" />
           <button type="submit" class="btn">+ Novo cartão</button>
-        </form>
-        <form method="post" action="{% url 'boards:update_board' board.pk %}">
-          {% csrf_token %}
-          <div>
-            <div>
-              <input name="title" value="{{ board.title }}" class="input" required />
-            </div>
-            <div>
-              <textarea name="description" class="input" placeholder="Descrição" {{ board.description }}</textarea>
-            </div>
-            <div>
-              <button type="submit" class="btn">Salvar</button>
-            </div>
-          </div>
         </form>
       </div>
     {% empty %}
@@ -95,7 +97,6 @@
           }
         );
         const data = await resp.json();
-        // <-- aqui é onde vai esse if/else
         if (data.is_done) {
             li.classList.add("done");
         } else {
@@ -107,6 +108,5 @@
     });
   });
 </script>
-
 
 {% endblock %}
