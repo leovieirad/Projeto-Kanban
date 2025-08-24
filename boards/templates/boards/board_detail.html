@@ -1,68 +1,74 @@
 {% extends "boards/base.html" %}
 
 {% block content %}
-  
-  <h1>{{ board.title }}</h1>
-  <p class="small">{{ board.description }}</p>
+<div class="board-container">
+  <!-- Título e descrição -->
+  <header class="board-header">
+    <h1 class="board-title">{{ board.title }}</h1>
+    <p class="board-description">{{ board.description }}</p>
+  </header>
 
-  <!-- form para editar quadro (fora do loop de colunas) -->
-  <form method="post" action="{% url 'boards:update_board' board.pk %}" class="mb-4">
-    {% csrf_token %}
-    <div>
-      <div>
+  <!-- Form para editar quadro -->
+  <section class="board-edit">
+    <form method="post" action="{% url 'boards:update_board' board.pk %}">
+      {% csrf_token %}
+      <div class="form-group">
         <input name="title" value="{{ board.title }}" class="input" required />
       </div>
-      <div>
+      <div class="form-group">
         <textarea name="description" class="input" placeholder="Descrição">{{ board.description }}</textarea>
       </div>
-      <div>
+      <div class="form-group">
         <button type="submit" class="btn">Salvar</button>
       </div>
-    </div>
-  </form>
+    </form>
+  </section>
 
-  <h2>Colunas</h2>
-  <div class="flex">
-    {% for column in board.columns.all %}
-      <div class="column">
-        <h3>{{ column.title }}</h3>
-        <ul>
-          {% for card in column.cards.all %}
-            <li class="card" data-card-id="{{ card.pk }}">
-              <label>
-                <input type="checkbox" class="toggle-done" {% if card.is_done %}checked{% endif %}>
-                <strong>{{ card.title }}</strong>
-              </label>
-              {% if card.is_done %}✓{% endif %}
-              <div class="small">{{ card.description }}</div>
-            </li>
-          {% empty %}
-            <li class="small">Nenhum cartão.</li>
-          {% endfor %}
-        </ul>
-        <!-- form rápido para criar cartão -->
-        <form method="post" action="{% url 'boards:create_card' column.pk %}">
+  <!-- Colunas -->
+  <section class="board-columns">
+    <div class="columns-container">
+      {% for column in board.columns.all %}
+        <div class="kanban-column">
+          <h3 class="column-title">{{ column.title }}</h3>
+          <ul class="cards-list">
+            {% for card in column.cards.all %}
+              <li class="card {% if card.is_done %}done{% endif %}" data-card-id="{{ card.pk }}">
+                <label>
+                  <input type="checkbox" class="toggle-done" {% if card.is_done %}checked{% endif %}>
+                  <span class="card-title">{{ card.title }}</span>
+                </label>
+                <p class="card-description">{{ card.description }}</p>
+              </li>
+            {% empty %}
+              <li class="card empty">Nenhum cartão.</li>
+            {% endfor %}
+          </ul>
+
+          <!-- Form rápido para criar cartão -->
+          <form method="post" action="{% url 'boards:create_card' column.pk %}" class="create-card-form">
+            {% csrf_token %}
+            <input name="title" placeholder="Título do cartão" class="input" required />
+            <input type="hidden" name="position" value="{{ column.cards.count }}" />
+            <button type="submit" class="btn small">+ Novo cartão</button>
+          </form>
+        </div>
+      {% empty %}
+        <p class="empty-columns">Sem colunas ainda.</p>
+      {% endfor %}
+
+      <!-- Adicionar coluna -->
+      <div class="kanban-column new-column">
+        <h3>+ Adicionar coluna</h3>
+        <form method="post" action="{% url 'boards:create_column' board.pk %}" class="create-column-form">
           {% csrf_token %}
-          <input name="title" placeholder="Título do cartão" class="input" required />
-          <input type="hidden" name="position" value="{{ column.cards.count }}" />
-          <button type="submit" class="btn">+ Novo cartão</button>
+          <input name="title" placeholder="Título da coluna" class="input" required />
+          <input type="hidden" name="position" value="{{ board.columns.count }}" />
+          <button type="submit" class="btn small">Adicionar</button>
         </form>
       </div>
-    {% empty %}
-      <p>Sem colunas ainda.</p>
-    {% endfor %}
-
-    <!-- adicionar coluna -->
-    <div class="column">
-      <h3>+ Adicionar coluna</h3>
-      <form method="post" action="{% url 'boards:create_column' board.pk %}">
-        {% csrf_token %}
-        <input name="title" placeholder="Título da coluna" class="input" required />
-        <input type="hidden" name="position" value="{{ board.columns.count }}" />
-        <button type="submit" class="btn">Adicionar</button>
-      </form>
     </div>
-  </div>
+  </section>
+</div>
 
 <script>
   function getCookie(name) {
@@ -98,9 +104,9 @@
         );
         const data = await resp.json();
         if (data.is_done) {
-            li.classList.add("done");
+          li.classList.add("done");
         } else {
-            li.classList.remove("done");
+          li.classList.remove("done");
         }
       } catch (err) {
         console.error("Erro toggle card:", err);
@@ -108,5 +114,4 @@
     });
   });
 </script>
-
 {% endblock %}

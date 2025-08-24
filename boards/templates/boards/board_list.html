@@ -1,15 +1,29 @@
 {% extends "boards/base.html" %}
 
 {% block content %}
-  <h1>Quadros</h1>
+<div class="container mx-auto px-6 py-8">
+    <div class="flex justify-between items-center mb-6">
+        <h1 class="text-3xl font-bold">Meus Quadros</h1>
+        <a href="{% url 'boards:create_board' %}" 
+           class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg shadow-md">
+            + Novo quadro
+        </a>
+    </div>
 
-  <ul>
-    {% for board in boards %}
-      <li><a href="{% url 'boards:detail' board.pk %}">{{ board.title }}</a></li>
-    {% empty %}
-      <li>Não há quadros ainda.</li>
-    {% endfor %}
-  </ul>
-
-  <p><a class="btn" href="{% url 'boards:create_board' %}">+ Novo quadro</a></p>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        {% for board in boards %}
+            <div class="bg-white shadow-md rounded-xl p-6 hover:shadow-lg transition">
+                <h2 class="text-xl font-semibold mb-2">
+                    {{ board.title }}
+                </h2>
+                <a href="{% url 'boards:detail' board.pk %}" 
+                   class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-2 rounded-lg">
+                    Abrir quadro
+                </a>
+            </div>
+        {% empty %}
+            <p class="text-gray-500">Não há quadros ainda.</p>
+        {% endfor %}
+    </div>
+</div>
 {% endblock %}
