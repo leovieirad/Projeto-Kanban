@@ -1,18 +1,19 @@
 {% extends "boards/base.html" %}
 
 {% block content %}
-  <h1>Criar quadro</h1>
-  <!-- Formulário simples: envia title e description -->
-  <form method="post">
-    {% csrf_token %}
-    <p>
-      <label for="id_title">Título</label><br />
-      <input id="id_title" name="title" placeholder="Título do quadro" required value="{{ form_data.title|default:'' }}">
-    </p>
-    <p>
-      <label for="id_description">Descrição</label><br />
-      <textarea id="id_description" name="description" placeholder="Descrição opcional">{{ form_data.description|default:'' }}</textarea>
-    </p>
-    <button type="submit">Salvar</button>
-  </form>
+<div class="form-container">
+    <h1>Novo Quadro</h1>
+
+    <form method="post" action="{% url 'boards:create_board' %}">
+        {% csrf_token %}
+
+        <label for="id_title">Título</label>
+        <input type="text" name="title" id="id_title" class="input" placeholder="Título do quadro" required>
+
+        <label for="id_description">Descrição</label>
+        <textarea name="description" id="id_description" class="textarea" placeholder="Descrição opcional"></textarea>
+
+        <button type="submit" class="btn-primary">Criar Quadro</button>
+    </form>
+</div>
 {% endblock %}
