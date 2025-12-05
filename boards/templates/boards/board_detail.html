@@ -1,117 +1,128 @@
 {% extends "boards/base.html" %}
+{% load static %}
 
 {% block content %}
-<div class="board-container">
-  <!-- Título e descrição -->
-  <header class="board-header">
-    <h1 class="board-title">{{ board.title }}</h1>
-    <p class="board-description">{{ board.description }}</p>
-  </header>
+<div class="container mt-4">
 
-  <!-- Form para editar quadro -->
-  <section class="board-edit">
-    <form method="post" action="{% url 'boards:update_board' board.pk %}">
-      {% csrf_token %}
-      <div class="form-group">
-        <input name="title" value="{{ board.title }}" class="input" required />
-      </div>
-      <div class="form-group">
-        <textarea name="description" class="input" placeholder="Descrição">{{ board.description }}</textarea>
-      </div>
-      <div class="form-group">
-        <button type="submit" class="btn">Salvar</button>
-      </div>
-    </form>
-  </section>
+    <h1>{{ board.title }}</h1>
+    <p>{{ board.description }}</p>
 
-  <!-- Colunas -->
-  <section class="board-columns">
-    <div class="columns-container">
-      {% for column in board.columns.all %}
-        <div class="kanban-column">
-          <h3 class="column-title">{{ column.title }}</h3>
-          <ul class="cards-list">
-            {% for card in column.cards.all %}
-              <li class="card {% if card.is_done %}done{% endif %}" data-card-id="{{ card.pk }}">
-                <label>
-                  <input type="checkbox" class="toggle-done" {% if card.is_done %}checked{% endif %}>
-                  <span class="card-title">{{ card.title }}</span>
-                </label>
-                <p class="card-description">{{ card.description }}</p>
-              </li>
-            {% empty %}
-              <li class="card empty">Nenhum cartão.</li>
-            {% endfor %}
-          </ul>
+    <!-- Botão Editar Quadro -->
+    <button id="btn-edit-board" class="btn btn-primary mb-3">
+        Editar quadro
+    </button>
 
-          <!-- Form rápido para criar cartão -->
-          <form method="post" action="{% url 'boards:create_card' column.pk %}" class="create-card-form">
+    <!-- Formulário escondido -->
+    <div id="edit-board-form" style="display: none;">
+        <form method="POST">
             {% csrf_token %}
-            <input name="title" placeholder="Título do cartão" class="input" required />
-            <input type="hidden" name="position" value="{{ column.cards.count }}" />
-            <button type="submit" class="btn small">+ Novo cartão</button>
-          </form>
-        </div>
-      {% empty %}
-        <p class="empty-columns">Sem colunas ainda.</p>
-      {% endfor %}
-
-      <!-- Adicionar coluna -->
-      <div class="kanban-column new-column">
-        <h3>+ Adicionar coluna</h3>
-        <form method="post" action="{% url 'boards:create_column' board.pk %}" class="create-column-form">
-          {% csrf_token %}
-          <input name="title" placeholder="Título da coluna" class="input" required />
-          <input type="hidden" name="position" value="{{ board.columns.count }}" />
-          <button type="submit" class="btn small">Adicionar</button>
+            {% if board_form %}
+                {{ board_form.as_p }}
+            {% else %}
+                <div class="mb-2">
+                    <label for="id_title" class="form-label">Título</label>
+                    <input type="text" name="title" id="id_title" class="form-control" value="{{ board.title }}">
+                </div>
+                <div class="mb-2">
+                    <label for="id_description" class="form-label">Descrição</label>
+                    <textarea name="description" id="id_description" class="form-control">{{ board.description }}</textarea>
+                </div>
+            {% endif %}
+            <button type="submit" class="btn btn-success">Salvar alterações</button>
         </form>
-      </div>
+        <hr>
     </div>
-  </section>
+
+    <div class="row">
+        {% for column in board.columns.all %}
+        <div class="col-md-4 mb-4">
+            <div class="card p-3">
+
+                <h4>{{ column.title }}</h4>
+
+                <!-- Lista de cartões -->
+                <ul>
+                    {% for card in column.cards.all %}
+                        <li>
+                            <strong>{{ card.title }}</strong>
+                            <br>
+                            {{ card.description }}
+
+                            <!-- Botão editar cartão -->
+                            <button class="btn btn-sm btn-link text-primary"
+                                onclick="toggleCardForm({{ card.id }})">
+                                Editar
+                            </button>
+
+                            <!-- Form edit card (hidden) -->
+                            <div id="card-form-{{ card.id }}" style="display:none;">
+                                <form method="POST" action="{% url 'boards:edit_card' card.id %}">
+                                    {% csrf_token %}
+                                    <input type="text" name="title" value="{{ card.title }}" class="form-control mb-2">
+                                    <textarea name="description" class="form-control mb-2">{{ card.description }}</textarea>
+                                    <button type="submit" class="btn btn-success btn-sm">Salvar</button>
+                                </form>
+                                <hr>
+                            </div>
+
+                        </li>
+                    {% empty %}
+                        <li><i>Nenhum cartão.</i></li>
+                    {% endfor %}
+                </ul>
+
+                <!-- Botão adicionar cartão -->
+                <button class="btn btn-sm btn-primary"
+                        onclick="toggleNewCardForm({{ column.id }})">
+                    + Adicionar cartão
+                </button>
+
+                <!-- Form novo cartão (hidden) -->
+                <div id="new-card-{{ column.id }}" style="display:none;" class="mt-2">
+                    <form method="POST" action="{% url 'boards:create_card' column.id %}">
+                        {% csrf_token %}
+                        <input type="text" name="title" class="form-control mb-2" placeholder="Título do cartão">
+                        <textarea name="description" class="form-control mb-2" placeholder="Descrição"></textarea>
+                        <button type="submit" class="btn btn-success btn-sm">Criar</button>
+                    </form>
+                </div>
+
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
 </div>
 
 <script>
-  function getCookie(name) {
-    let cookieValue = null;
-    if (document.cookie && document.cookie !== "") {
-      const cookies = document.cookie.split(";");
-      for (let i = 0; i < cookies.length; i++) {
-        const cookie = cookies[i].trim();
-        if (cookie.startsWith(name + "=")) {
-          cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-          break;
-        }
-      }
+document.addEventListener('DOMContentLoaded', function () {
+    const btnEdit = document.getElementById("btn-edit-board");
+    const editForm = document.getElementById("edit-board-form");
+    if (btnEdit && editForm) {
+        btnEdit.addEventListener('click', function (e) {
+            e.preventDefault();
+            if (editForm.style.display === "none" || editForm.style.display === "") {
+                editForm.style.display = "block";
+            } else {
+                editForm.style.display = "none";
+            }
+            const firstInput = editForm.querySelector('input, textarea');
+            if (firstInput && editForm.style.display === "block") firstInput.focus();
+        });
     }
-    return cookieValue;
-  }
-  const csrftoken = getCookie("csrftoken");
 
-  document.querySelectorAll(".toggle-done").forEach((checkbox) => {
-    checkbox.addEventListener("change", async (e) => {
-      const li = e.target.closest("li.card");
-      const cardId = li.dataset.cardId;
-      try {
-        const resp = await fetch(
-          `{% url 'boards:toggle_card_done' 0 %}`.replace("/0/", `/${cardId}/`),
-          {
-            method: "POST",
-            headers: {
-              "X-CSRFToken": csrftoken,
-              Accept: "application/json",
-            },
-          }
-        );
-        const data = await resp.json();
-        if (data.is_done) {
-          li.classList.add("done");
-        } else {
-          li.classList.remove("done");
-        }
-      } catch (err) {
-        console.error("Erro toggle card:", err);
-      }
-    });
-  });
+    window.toggleCardForm = function(id) {
+        let div = document.getElementById("card-form-" + id);
+        if (!div) return;
+        div.style.display = div.style.display === "none" || div.style.display === "" ? "block" : "none";
+    };
+
+    window.toggleNewCardForm = function(id) {
+        let div = document.getElementById("new-card-" + id);
+        if (!div) return;
+        div.style.display = div.style.display === "none" || div.style.display === "" ? "block" : "none";
+    };
+});
 </script>
+
 {% endblock %}
