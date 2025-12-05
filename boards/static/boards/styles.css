@@ -1,29 +1,29 @@
 .page-title {
-    font-size: 28px;
-    margin-bottom: 20px;
-    font-weight: bold;
+  font-size: 28px;
+  margin-bottom: 20px;
+  font-weight: bold;
 }
 
 .header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 30px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
 }
 
 .boards-grid {
-    display: grid;
-    gap: 20px;
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  display: grid;
+  gap: 20px;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
 }
 
 .board-card {
-    background: #fff;
-    border: 1px solid #ddd;
-    padding: 18px 20px;
-    border-radius: 10px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-    transition: .2s;
+  background: #fff;
+  border: 1px solid #ddd;
+  padding: 18px 20px;
+  border-radius: 10px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  transition: .2s;
 }
 
 .board-card:hover {
@@ -32,26 +32,33 @@
 }
 
 .btn-primary {
-    background: #4c6ef5;
-    color: white;
-    padding: 10px 16px;
-    border-radius: 8px;
-    text-decoration: none;
-    font-weight: 600;
+  background: #4c6ef5;
+  color: white;
+  padding: 10px 16px;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 600;
 }
 
 .btn-secondary {
-    display: inline-block;
-    margin-top: 10px;
-    padding: 8px 14px;
-    background: #e9ecef;
-    border-radius: 6px;
-    text-decoration: none;
+  display: inline-block;
+  margin-top: 10px;
+  padding: 8px 14px;
+  background: #e9ecef;
+  border-radius: 6px;
+  text-decoration: none;
 }
 
 .empty-text {
     font-size: 18px;
     color: #777;
+}
+
+/* Tipografia global */
+body {
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "Liberation Sans", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 /* Modo CLARO */
@@ -74,6 +81,19 @@ body.dark-mode textarea {
   border: 1px solid #555;
 }
 
+/* Inputs — general */
+input, textarea, .input, .textarea {
+  font-family: inherit;
+  font-size: 15px;
+  line-height: 1.25;
+}
+
+input:focus, textarea:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(76,110,245,0.12);
+  border-color: #4c6ef5;
+}
+
 /* Cabeçalho */
 .top-nav {
   display: flex;
@@ -89,6 +109,23 @@ body.dark-mode .top-nav {
   border-bottom: 1px solid #444;
   background: #232529;
 }
+
+/* Links no topo e geral (evita roxo de visited) */
+.top-nav a,
+a { color: #214b9a; text-decoration: none; }
+
+.top-nav a:hover, a:hover { text-decoration: underline; }
+
+body.dark-mode .top-nav a,
+body.dark-mode a { color: #8fb3ff; }
+
+body.dark-mode a:visited, body.dark-mode .top-nav a:visited { color: #94b6ff; }
+
+/* Ajuste visual do topo para modo escuro */
+body.dark-mode .top-nav { background: #111214; }
+
+/* Reduce prominence of hr in dark mode */
+body.dark-mode hr { border-color: #333; }
 
 #theme-toggle {
   margin-left: auto;
@@ -123,6 +160,21 @@ body.dark-mode .form-container {
   background: #2b2d31;
 }
 
+/* Improve look of inline edit form used in board_detail */
+#edit-board-form {
+  max-width: 900px;
+  margin: 12px 0 18px 0;
+  padding: 14px 18px;
+  background: rgba(255,255,255,0.95);
+  border-radius: 8px;
+  border: 1px solid #e6e9ef;
+}
+
+body.dark-mode #edit-board-form {
+  background: rgba(32,34,38,0.85);
+  border: 1px solid #3a3b3f;
+}
+
 .form-container h1 {
   margin-bottom: 20px;
 }
@@ -135,11 +187,11 @@ label {
 
 .input, .textarea {
   width: 100%;
-  padding: 12px;
+  padding: 10px 12px;
   border-radius: 6px;
   border: 1px solid #ccc;
-  margin-bottom: 15px;
-  font-size: 16px;
+  margin-bottom: 12px;
+  font-size: 15px;
 }
 
 body.dark-mode .input,
@@ -164,3 +216,18 @@ body.dark-mode .textarea {
 .btn-primary:hover {
   background: #3158d1;
 }
+
+/* General button styles to cover .btn and bootstrap-like classes used in templates */
+.btn { font-weight: 600; border-radius: 8px; padding: 8px 12px; cursor: pointer; }
+
+.btn-success { background: #2ea44f; color: #fff; border: none; }
+.btn-success:hover { background: #23863a; }
+
+.btn-link { background: transparent; color: #214b9a; border: none; padding: 0; text-decoration: underline; }
+body.dark-mode .btn-link { color: #9fc1ff; }
+
+/* Small button variant used in templates */
+.btn-sm { padding: 6px 10px; font-size: 14px; border-radius: 6px; }
+
+/* Make the big blue add buttons look centered and consistent */
+.btn-primary.full-width { display:block; text-align:center; width:100%; }
