@@ -231,3 +231,60 @@ body.dark-mode .btn-link { color: #9fc1ff; }
 
 /* Make the big blue add buttons look centered and consistent */
 .btn-primary.full-width { display:block; text-align:center; width:100%; }
+
+/* Kanban board layout */
+.board-columns {
+  display: flex;
+  gap: 18px;
+  align-items: flex-start;
+  margin-top: 18px;
+}
+
+.board-column {
+  background: rgba(255,255,255,0.95);
+  border: 1px solid #e6e9ef;
+  border-radius: 10px;
+  padding: 12px;
+  width: 100%;
+  max-width: 320px;
+  box-shadow: 0 6px 18px rgba(20,30,60,0.06);
+}
+
+body.dark-mode .board-column {
+  background: rgba(28,30,34,0.85);
+  border: 1px solid #37383c;
+  box-shadow: none;
+}
+
+.board-column h4 {
+  margin: 6px 0 12px 0;
+  font-size: 16px;
+}
+
+.kanban-list {
+  min-height: 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.kanban-card {
+  background: #fff;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid #e6e9ef;
+  box-shadow: 0 2px 6px rgba(20,30,60,0.06);
+  cursor: grab;
+}
+
+body.dark-mode .kanban-card {
+  background: #232529;
+  border: 1px solid #3a3b3f;
+}
+
+.kanban-card.dragging { opacity: 0.6; }
+
+.kanban-list.drop-target { background: rgba(76,110,245,0.04); border-radius: 6px; }
+
+.card-meta { font-size: 12px; color: #666; margin-top:6px; }
+body.dark-mode .card-meta { color: #aaa; }

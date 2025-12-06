@@ -3,6 +3,8 @@ from django.views.decorators.http import require_POST
 from django.shortcuts import render, get_object_or_404, redirect
 from django.views.generic import ListView, DetailView
 from .models import Board, Column, Card
+import json
+from django.db import transaction
 
 class BoardListView(ListView):
     model = Board
@@ -70,4 +72,39 @@ def create_card(request, column_id):
             description=request.POST.get("description")
         )
     return redirect("board_detail", board_id=column.board.id)
+
+
+@require_POST
+def reorder_cards(request):
+    """Recebe um JSON com a nova ordem dos cartões por coluna e atualiza DB.
+
+    Formato esperado (JSON):
+    {"columns": [{"id": 1, "cards": [3,5,2]}, {"id":2, "cards": [4,1]}]}
+    """
+    try:
+        payload = json.loads(request.body.decode("utf-8"))
+    except Exception:
+        return JsonResponse({"ok": False, "error": "invalid_json"}, status=400)
+
+    columns = payload.get("columns")
+    if not isinstance(columns, list):
+        return JsonResponse({"ok": False, "error": "missing_columns"}, status=400)
+
+    # Atualiza posições dentro de uma transação
+    with transaction.atomic():
+        for col in columns:
+            col_id = col.get("id")
+            cards = col.get("cards") or []
+            for pos, card_id in enumerate(cards):
+                try:
+                    card = Card.objects.select_for_update().get(id=card_id)
+                    # atualiza coluna se necessário
+                    if card.column_id != col_id:
+                        card.column_id = col_id
+                    card.position = pos
+                    card.save()
+                except Card.DoesNotExist:
+                    continue
+
+    return JsonResponse({"ok": True})
 

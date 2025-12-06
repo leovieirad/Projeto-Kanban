@@ -33,60 +33,42 @@
         <hr>
     </div>
 
-    <div class="row">
+    <div class="board-columns">
         {% for column in board.columns.all %}
-        <div class="col-md-4 mb-4">
-            <div class="card p-3">
+        <div class="board-column" data-column-id="{{ column.id }}">
+            <h4>{{ column.title }}</h4>
 
-                <h4>{{ column.title }}</h4>
+            <div class="kanban-list" data-column-id="{{ column.id }}">
+                {% for card in column.cards.all %}
+                <div class="kanban-card" draggable="true" data-card-id="{{ card.id }}">
+                    <div class="card-title"><strong>{{ card.title }}</strong></div>
+                    <div class="card-desc">{{ card.description }}</div>
+                    <div class="card-actions">
+                        <button class="btn btn-sm btn-link" onclick="toggleCardForm({{ card.id }})">Editar</button>
+                    </div>
 
-                <!-- Lista de cartões -->
-                <ul>
-                    {% for card in column.cards.all %}
-                        <li>
-                            <strong>{{ card.title }}</strong>
-                            <br>
-                            {{ card.description }}
-
-                            <!-- Botão editar cartão -->
-                            <button class="btn btn-sm btn-link text-primary"
-                                onclick="toggleCardForm({{ card.id }})">
-                                Editar
-                            </button>
-
-                            <!-- Form edit card (hidden) -->
-                            <div id="card-form-{{ card.id }}" style="display:none;">
-                                <form method="POST" action="{% url 'boards:edit_card' card.id %}">
-                                    {% csrf_token %}
-                                    <input type="text" name="title" value="{{ card.title }}" class="form-control mb-2">
-                                    <textarea name="description" class="form-control mb-2">{{ card.description }}</textarea>
-                                    <button type="submit" class="btn btn-success btn-sm">Salvar</button>
-                                </form>
-                                <hr>
-                            </div>
-
-                        </li>
-                    {% empty %}
-                        <li><i>Nenhum cartão.</i></li>
-                    {% endfor %}
-                </ul>
-
-                <!-- Botão adicionar cartão -->
-                <button class="btn btn-sm btn-primary"
-                        onclick="toggleNewCardForm({{ column.id }})">
-                    + Adicionar cartão
-                </button>
-
-                <!-- Form novo cartão (hidden) -->
-                <div id="new-card-{{ column.id }}" style="display:none;" class="mt-2">
-                    <form method="POST" action="{% url 'boards:create_card' column.id %}">
-                        {% csrf_token %}
-                        <input type="text" name="title" class="form-control mb-2" placeholder="Título do cartão">
-                        <textarea name="description" class="form-control mb-2" placeholder="Descrição"></textarea>
-                        <button type="submit" class="btn btn-success btn-sm">Criar</button>
-                    </form>
+                    <div id="card-form-{{ card.id }}" style="display:none; margin-top:8px;">
+                        <form method="POST" action="{% url 'boards:edit_card' card.id %}">
+                            {% csrf_token %}
+                            <input type="text" name="title" value="{{ card.title }}" class="form-control mb-2">
+                            <textarea name="description" class="form-control mb-2">{{ card.description }}</textarea>
+                            <button type="submit" class="btn btn-success btn-sm">Salvar</button>
+                        </form>
+                    </div>
                 </div>
+                {% empty %}
+                <div class="card-empty"><i>Nenhum cartão.</i></div>
+                {% endfor %}
+            </div>
 
+            <button class="btn btn-primary full-width" onclick="toggleNewCardForm({{ column.id }})">+ Adicionar cartão</button>
+            <div id="new-card-{{ column.id }}" style="display:none; margin-top:8px;">
+                <form method="POST" action="{% url 'boards:create_card' column.id %}">
+                    {% csrf_token %}
+                    <input type="text" name="title" class="form-control mb-2" placeholder="Título do cartão">
+                    <textarea name="description" class="form-control mb-2" placeholder="Descrição"></textarea>
+                    <button type="submit" class="btn btn-success btn-sm">Criar</button>
+                </form>
             </div>
         </div>
         {% endfor %}
@@ -122,6 +104,108 @@ document.addEventListener('DOMContentLoaded', function () {
         if (!div) return;
         div.style.display = div.style.display === "none" || div.style.display === "" ? "block" : "none";
     };
+
+    // Drag and drop behavior
+    let dragged = null;
+
+    function onDragStart(e) {
+        dragged = e.currentTarget;
+        dragged.classList.add('dragging');
+        e.dataTransfer.effectAllowed = 'move';
+        e.dataTransfer.setData('text/plain', dragged.dataset.cardId);
+    }
+
+    function onDragEnd(e) {
+        if (dragged) dragged.classList.remove('dragging');
+        dragged = null;
+    }
+
+    function onDragOverList(e) {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'move';
+        this.classList.add('drop-target');
+    }
+
+    function onDragLeaveList(e) {
+        this.classList.remove('drop-target');
+    }
+
+    function onDropList(e) {
+        e.preventDefault();
+        this.classList.remove('drop-target');
+        const cardId = e.dataTransfer.getData('text/plain');
+        const cardElem = document.querySelector('[data-card-id="' + cardId + '"]');
+        if (!cardElem) return;
+        // Append at drop target (end)
+        this.appendChild(cardElem);
+        saveBoardOrder();
+    }
+
+    function attachDnD() {
+        document.querySelectorAll('.kanban-card').forEach(function(card){
+            card.removeEventListener('dragstart', onDragStart);
+            card.removeEventListener('dragend', onDragEnd);
+            card.addEventListener('dragstart', onDragStart);
+            card.addEventListener('dragend', onDragEnd);
+        });
+
+        document.querySelectorAll('.kanban-list').forEach(function(list){
+            list.removeEventListener('dragover', onDragOverList);
+            list.removeEventListener('dragleave', onDragLeaveList);
+            list.removeEventListener('drop', onDropList);
+            list.addEventListener('dragover', onDragOverList);
+            list.addEventListener('dragleave', onDragLeaveList);
+            list.addEventListener('drop', onDropList);
+        });
+    }
+
+    // Save order via AJAX
+    function getCsrfToken() {
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+        return getCookie('csrftoken');
+    }
+
+    function saveBoardOrder() {
+        const columns = [];
+        document.querySelectorAll('.board-column').forEach(function(col){
+            const colId = parseInt(col.dataset.columnId);
+            const cards = [];
+            col.querySelectorAll('.kanban-card').forEach(function(card){
+                cards.push(parseInt(card.dataset.cardId));
+            });
+            columns.push({id: colId, cards: cards});
+        });
+
+        const url = "{% url 'boards:reorder_cards' %}";
+        fetch(url, {
+            method: 'POST',
+            credentials: 'same-origin',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCsrfToken(),
+            },
+            body: JSON.stringify({columns: columns})
+        }).then(resp => resp.json())
+          .then(data => {
+              if (!data.ok) console.warn('reorder failed', data);
+          }).catch(err => console.error(err));
+    }
+
+    // Attach DnD after initial render
+    attachDnD();
 });
 </script>
 
