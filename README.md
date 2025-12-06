@@ -1,9 +1,9 @@
 # 📌 Projeto Kanban
 
 ## 🌐 Sobre o Projeto (About the Project)  
-Esse é um projeto de **Quadro Kanban Online** desenvolvido utilizando **Python**, **Django**, **HTML**, **CSS** e **Bootstrap**. O objetivo é permitir que usuários organizem tarefas em colunas (como "A Fazer", "Em Andamento" e "Concluído") de forma prática e visual.
+Esse é um projeto de **Quadro Kanban Online** desenvolvido utilizando: **Python**, **Django**, **HTML**, **CSS** e **Bootstrap**. O objetivo é permitir que usuários organizem tarefas em colunas (como "A Fazer", "Em Andamento" e "Concluído") de forma prática e visual.
 
-> This is an **Online Kanban Board** project built using **Python**, **Django**, **HTML**, **CSS**, and **Bootstrap**. The goal is to allow users to organize tasks into columns (such as "To Do", "In Progress", and "Done") in a practical and visual way.
+> This is an **Online Kanban Board** project built using: **Python**, **Django**, **HTML**, **CSS**, and **Bootstrap**. The goal is to allow users to organize tasks into columns (such as "To Do", "In Progress", and "Done") in a practical and visual way.
 
 ---
 
