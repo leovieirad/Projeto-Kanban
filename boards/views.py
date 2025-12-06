@@ -23,6 +23,10 @@ def create_board(request):
         description = request.POST.get("description", "").strip()
         if title:
             board = Board.objects.create(title=title, description=description)
+            # Create default columns to standardize new boards (To Do, In Progress, Done)
+            default_columns = ["To Do", "In Progress", "Done"]
+            for idx, col_title in enumerate(default_columns):
+                Column.objects.create(board=board, title=col_title, position=idx)
             messages.success(request, "Quadro criado com sucesso.")
             return redirect("boards:detail", pk=board.pk)
     return render(request, "boards/board_form.html")

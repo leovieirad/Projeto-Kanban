@@ -21,14 +21,12 @@
 
 <hr>
 
-<!-- Toast container for Django messages and JS notifications -->
-<div id="toast-area" aria-live="polite" aria-atomic="true">
+<!-- Floating toast container (top-right) for Django messages and JS notifications -->
+<div class="floating-toast" aria-live="polite" aria-atomic="true">
   {% if messages %}
-    <div class="message-list">
-      {% for message in messages %}
-        <div class="site-toast {{ message.tags }}">{{ message }}</div>
-      {% endfor %}
-    </div>
+    {% for message in messages %}
+      <div class="toast-item {{ message.tags }}">{{ message }}</div>
+    {% endfor %}
   {% endif %}
 </div>
 
@@ -43,9 +41,9 @@ toggle.addEventListener("click", () => {
 // Auto-hide Django message toasts after a short delay
 (function(){
   try{
-    const toasts = document.querySelectorAll('.site-toast');
+    const toasts = document.querySelectorAll('.floating-toast .toast-item');
     toasts.forEach(function(t,i){
-      setTimeout(()=>{ t.style.transition='opacity 0.4s'; t.style.opacity='0'; setTimeout(()=>t.remove(),400); }, 2500 + i*300);
+      setTimeout(()=>{ t.style.transition='opacity 0.4s'; t.style.opacity='0'; setTimeout(()=>t.remove(),400); }, 3000 + i*350);
     });
   }catch(e){}
 })();

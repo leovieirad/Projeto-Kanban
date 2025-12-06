@@ -309,15 +309,29 @@ body.dark-mode .site-toast.error { background: rgba(255,80,80,0.08); color: #ffd
 .floating-toast {
   position: fixed;
   right: 18px;
-  bottom: 18px;
-  z-index: 2000;
+  top: 18px;
+  z-index: 2200;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+  max-width: 420px;
 }
 .floating-toast .toast-item {
-  margin-top: 8px;
-  padding: 10px 14px;
-  border-radius: 8px;
-  background: rgba(0,0,0,0.75);
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 14px 18px;
+  border-radius: 10px;
+  background: rgba(0,0,0,0.85);
   color: #fff;
+  font-size: 15px;
+  font-weight: 600;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.35);
 }
 .floating-toast .toast-item.success { background: #2ea44f; }
 .floating-toast .toast-item.error { background: #d73a49; }
+body.dark-mode .floating-toast .toast-item { background: rgba(255,255,255,0.06); color: #eee; }
+body.dark-mode .floating-toast .toast-item.success { background: rgba(46,164,80,0.14); color: #eaffea; }
+body.dark-mode .floating-toast .toast-item.error { background: rgba(215,58,73,0.12); color: #ffdfe0; }
