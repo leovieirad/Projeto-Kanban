@@ -3,7 +3,7 @@
 ## 🌐 Sobre o Projeto (About the Project)  
 Esse é um projeto de **Quadro Kanban Online** desenvolvido utilizando **Python**, **Django**, **HTML**, **CSS** e **Bootstrap**. O objetivo é permitir que usuários organizem tarefas em colunas (como "A Fazer", "Em Andamento" e "Concluído") de forma prática e visual.
 
-> Este é um **Quadro Kanban Online** desenvolvido com **Python**, **Django**, **HTML**, **CSS** e **Bootstrap**. O objetivo é permitir que usuários organizem tarefas em colunas (como "A Fazer", "Fazendo" e "Feito") de forma prática e visual.
+> This is an **Online Kanban Board** project built using **Python**, **Django**, **HTML**, **CSS**, and **Bootstrap**. The goal is to allow users to organize tasks into columns (such as "To Do", "In Progress", and "Done") in a practical and visual way.
 
 ---
 
@@ -24,20 +24,20 @@ Esse é um projeto de **Quadro Kanban Online** desenvolvido utilizando **Python*
 - **Visual Responsivo**  
   Funciona bem em desktop e dispositivos móveis.
 
-> **Cadastro e Login de Usuário**  
-  Sistema de autenticação para acesso às tarefas pessoais.
+> **User Registration and Login**  
+  Authentication system for accessing personal tasks.
 
-> **Criação de Quadros e Colunas**  
-  Possibilidade de criar múltiplos quadros com colunas personalizadas.
+> **Board and Column Creation**  
+  Ability to create multiple boards with custom columns.
 
-> **Gerenciamento de Tarefas**  
-  Criação, edição, movimentação e exclusão de tarefas entre colunas.
+> **Task Management**  
+  Create, edit, move, and delete tasks across columns.
 
-> **Arrastar e Soltar (Drag and Drop)**  
-  Interface intuitiva para reorganizar tarefas com facilidade.
+> **Drag and Drop Interface**  
+  Intuitive interface for easily reorganizing tasks.
 
-> **Visual Responsivo**  
-  Funciona bem em desktop e dispositivos móveis.
+> **Responsive Layout**  
+  Works well on desktop and mobile devices.
 
 ---
 
@@ -49,11 +49,11 @@ Esse é um projeto de **Quadro Kanban Online** desenvolvido utilizando **Python*
 - **Bootstrap**: estilização rápida e responsiva.
 - **JavaScript**: funcionalidades de interação como drag-and-drop.
 
-> **Python**: lógica principal do projeto.  
-> **Django**: gerenciamento de usuários, tarefas e quadros.  
-> **HTML & CSS**: estrutura e visual da aplicação.  
-> **Bootstrap**: estilização rápida e responsiva.  
-> **JavaScript**: funcionalidades interativas como arrastar e soltar.
+> **Python**: main logic of the project.  
+> **Django**: managing users, tasks, and boards.  
+> **HTML & CSS**: structure and visual layout.  
+> **Bootstrap**: quick and responsive styling.  
+> **JavaScript**: interactive features like drag-and-drop.
 
 ---
 
@@ -61,4 +61,4 @@ Esse é um projeto de **Quadro Kanban Online** desenvolvido utilizando **Python*
 
 A interface do sistema Kanban é inspirada em ferramentas modernas de produtividade. Cada quadro pode ser personalizado conforme o estilo de trabalho do usuário, permitindo controle visual claro das tarefas.
 
-> A interface do sistema Kanban é inspirada em ferramentas modernas de produtividade. Cada quadro pode ser personalizado conforme o fluxo de trabalho do usuário, permitindo um controle visual claro das tarefas.
+> The Kanban system interface is inspired by modern productivity tools. Each board can be customized to fit the user’s workflow, allowing a clear visual control of tasks.
