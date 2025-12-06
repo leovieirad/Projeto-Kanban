@@ -19,7 +19,7 @@ urlpatterns = [
     path("boards/<int:board_pk>/colunas/novo/", create_column, name="create_column"),
     
     # ✔️ manter só esta rota de criar cartão
-    path("colunas/<int:column_pk>/cartoes/novo/", create_card, name="create_card"),
+    path("colunas/<int:column_id>/cartoes/novo/", create_card, name="create_card"),
 
     path("boards/<int:pk>/editar/", update_board, name="update_board"),
     path("cartoes/<int:card_pk>/toggle-done/", toggle_card_done, name="toggle_card_done"),

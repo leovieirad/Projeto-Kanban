@@ -60,7 +60,7 @@ def edit_card(request, card_id):
         card.title = request.POST.get("title")
         card.description = request.POST.get("description")
         card.save()
-    return redirect("board_detail", board_id=card.column.board.id)
+    return redirect("boards:detail", pk=card.column.board.id)
 
 
 def create_card(request, column_id):
@@ -71,7 +71,7 @@ def create_card(request, column_id):
             title=request.POST.get("title"),
             description=request.POST.get("description")
         )
-    return redirect("board_detail", board_id=column.board.id)
+    return redirect("boards:detail", pk=column.board.id)
 
 
 @require_POST

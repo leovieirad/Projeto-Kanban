@@ -14,7 +14,7 @@
 
     <!-- Formulário escondido -->
     <div id="edit-board-form" style="display: none;">
-        <form method="POST">
+        <form method="POST" action="{% url 'boards:update_board' board.id %}">
             {% csrf_token %}
             {% if board_form %}
                 {{ board_form.as_p }}
