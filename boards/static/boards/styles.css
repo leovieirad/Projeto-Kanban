@@ -263,6 +263,18 @@ body.dark-mode .btn-link { color: #9fc1ff; }
 
 .board-card:hover { transform: translateY(-6px); box-shadow: 0 20px 40px rgba(16,24,40,0.08); }
 
+/* Dark mode adjustments for board cards and buttons */
+body.dark-mode .board-card {
+  background: linear-gradient(180deg, #151617, #0f1113);
+  border: 1px solid #232427;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.6);
+  color: #e8eef6;
+}
+body.dark-mode .board-card h2 { color: #eef6ff; }
+body.dark-mode .btn-primary { background: #2f56f6; box-shadow: 0 6px 18px rgba(47,86,246,0.14); }
+body.dark-mode .btn-primary:hover { box-shadow: 0 10px 30px rgba(47,86,246,0.22); }
+body.dark-mode .btn-secondary { color: #bcd9ff; border-color: rgba(140,160,200,0.06); }
+
 .btn-secondary {
   background: transparent;
   color: #214b9a;
