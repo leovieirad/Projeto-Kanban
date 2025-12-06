@@ -7,6 +7,15 @@
     <h1>{{ board.title }}</h1>
     <p>{{ board.description }}</p>
 
+    <!-- Criar nova coluna -->
+    <div style="margin:12px 0;">
+        <form method="POST" action="{% url 'boards:create_column' board.id %}" style="display:flex;gap:8px;align-items:center;max-width:480px;">
+            {% csrf_token %}
+            <input type="text" name="title" placeholder="Nova coluna (ex: To Do)" class="form-control" style="flex:1;"/>
+            <button type="submit" class="btn btn-secondary">Criar coluna</button>
+        </form>
+    </div>
+
     <!-- Botão Editar Quadro -->
     <button id="btn-edit-board" class="btn btn-primary mb-3">
         Editar quadro
@@ -200,8 +209,33 @@ document.addEventListener('DOMContentLoaded', function () {
             body: JSON.stringify({columns: columns})
         }).then(resp => resp.json())
           .then(data => {
-              if (!data.ok) console.warn('reorder failed', data);
-          }).catch(err => console.error(err));
+              if (data && data.ok) {
+                  showToast('Ordem salva', 'success');
+              } else {
+                  showToast('Falha ao salvar ordem', 'error');
+                  console.warn('reorder failed', data);
+              }
+          }).catch(err => {
+              showToast('Erro de rede ao salvar', 'error');
+              console.error(err);
+          });
+    }
+
+    // Simple floating toast for AJAX feedback
+    function showToast(message, type) {
+        try {
+            let container = document.querySelector('.floating-toast');
+            if (!container) {
+                container = document.createElement('div');
+                container.className = 'floating-toast';
+                document.body.appendChild(container);
+            }
+            const item = document.createElement('div');
+            item.className = 'toast-item ' + (type || '');
+            item.textContent = message;
+            container.appendChild(item);
+            setTimeout(() => { item.style.opacity = '0'; setTimeout(()=> item.remove(), 400); }, 2400);
+        } catch(e) { console.warn('toast fail', e); }
     }
 
     // Attach DnD after initial render

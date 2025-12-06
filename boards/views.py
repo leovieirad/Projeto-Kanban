@@ -1,6 +1,7 @@
 from django.http import JsonResponse
 from django.views.decorators.http import require_POST
 from django.shortcuts import render, get_object_or_404, redirect
+from django.contrib import messages
 from django.views.generic import ListView, DetailView
 from .models import Board, Column, Card
 import json
@@ -22,6 +23,7 @@ def create_board(request):
         description = request.POST.get("description", "").strip()
         if title:
             board = Board.objects.create(title=title, description=description)
+            messages.success(request, "Quadro criado com sucesso.")
             return redirect("boards:detail", pk=board.pk)
     return render(request, "boards/board_form.html")
 
@@ -35,6 +37,7 @@ def create_column(request, board_pk):
                 title=title,
                 position=board.columns.count()
             )
+            messages.success(request, "Coluna criada com sucesso.")
     return redirect("boards:detail", pk=board.pk)
 
 def update_board(request, pk):
@@ -43,6 +46,7 @@ def update_board(request, pk):
         board.title = request.POST.get("title")
         board.description = request.POST.get("description")
         board.save()
+        messages.success(request, "Quadro atualizado.")
         return redirect("boards:detail", pk=pk)
 
     return render(request, "boards/board_form.html", {"form_data": board})
@@ -60,6 +64,7 @@ def edit_card(request, card_id):
         card.title = request.POST.get("title")
         card.description = request.POST.get("description")
         card.save()
+        messages.success(request, "Cartão atualizado.")
     return redirect("boards:detail", pk=card.column.board.id)
 
 
@@ -71,6 +76,7 @@ def create_card(request, column_id):
             title=request.POST.get("title"),
             description=request.POST.get("description")
         )
+        messages.success(request, "Cartão criado.")
     return redirect("boards:detail", pk=column.board.id)
 
 

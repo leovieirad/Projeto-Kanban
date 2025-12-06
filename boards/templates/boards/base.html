@@ -21,6 +21,17 @@
 
 <hr>
 
+<!-- Toast container for Django messages and JS notifications -->
+<div id="toast-area" aria-live="polite" aria-atomic="true">
+  {% if messages %}
+    <div class="message-list">
+      {% for message in messages %}
+        <div class="site-toast {{ message.tags }}">{{ message }}</div>
+      {% endfor %}
+    </div>
+  {% endif %}
+</div>
+
 {% block content %}
 {% endblock %}
 
@@ -29,6 +40,15 @@ const toggle = document.getElementById("theme-toggle");
 toggle.addEventListener("click", () => {
   document.body.classList.toggle("dark-mode");
 });
+// Auto-hide Django message toasts after a short delay
+(function(){
+  try{
+    const toasts = document.querySelectorAll('.site-toast');
+    toasts.forEach(function(t,i){
+      setTimeout(()=>{ t.style.transition='opacity 0.4s'; t.style.opacity='0'; setTimeout(()=>t.remove(),400); }, 2500 + i*300);
+    });
+  }catch(e){}
+})();
 </script>
 
 </body>

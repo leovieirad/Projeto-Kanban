@@ -288,3 +288,36 @@ body.dark-mode .kanban-card {
 
 .card-meta { font-size: 12px; color: #666; margin-top:6px; }
 body.dark-mode .card-meta { color: #aaa; }
+
+/* Toast styles */
+.site-toast {
+  display: inline-block;
+  padding: 10px 14px;
+  border-radius: 8px;
+  margin: 8px;
+  background: rgba(0,0,0,0.06);
+  color: #111;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.06);
+}
+.site-toast.success { background: #e6f4ea; color: #1f7a3a; border: 1px solid #c9efd0; }
+.site-toast.error { background: #fdecea; color: #8a1f1f; border: 1px solid #f5c6c6; }
+body.dark-mode .site-toast { background: rgba(255,255,255,0.03); color: #eee; }
+body.dark-mode .site-toast.success { background: rgba(46,164,80,0.12); color: #c9ffd9; }
+body.dark-mode .site-toast.error { background: rgba(255,80,80,0.08); color: #ffd4d4; }
+
+/* Floating temporary toast container for JS notifications */
+.floating-toast {
+  position: fixed;
+  right: 18px;
+  bottom: 18px;
+  z-index: 2000;
+}
+.floating-toast .toast-item {
+  margin-top: 8px;
+  padding: 10px 14px;
+  border-radius: 8px;
+  background: rgba(0,0,0,0.75);
+  color: #fff;
+}
+.floating-toast .toast-item.success { background: #2ea44f; }
+.floating-toast .toast-item.error { background: #d73a49; }
