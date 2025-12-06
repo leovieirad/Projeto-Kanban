@@ -2,22 +2,39 @@
 
 {% block content %}
 <div class="page">
-  <div class="header">
-      <h1 class="page-title">Meus Quadros</h1>
-      <a href="{% url 'boards:create_board' %}" class="btn-primary">+ Novo quadro</a>
-  </div>
+    <div class="header">
+            <div style="display:flex;align-items:center;gap:16px;flex:1;">
+                <h1 class="page-title">Meus Quadros</h1>
+                <form method="get" class="board-search" style="margin-left:8px;">
+                    <input name="q" type="search" class="search-input" placeholder="Procurar quadros..." value="{{ request.GET.q }}">
+                </form>
+            </div>
+            <a href="{% url 'boards:create_board' %}" class="btn-primary btn-new">+ Novo quadro</a>
+    </div>
 
-  {% if boards %}
-      <div class="boards-grid">
-          {% for board in boards %}
-          <div class="board-card">
-              <h2>{{ board.title }}</h2>
-              <a class="btn-secondary" href="{% url 'boards:detail' board.pk %}">Abrir quadro</a>
-          </div>
-          {% endfor %}
-      </div>
-  {% else %}
-      <p class="empty-text">Você ainda não possui quadros cadastrados.</p>
-  {% endif %}
+    {% if boards %}
+            <div class="boards-grid">
+                    {% for board in boards %}
+                    <div class="board-card">
+                            <div>
+                                <h2>{{ board.title }}</h2>
+                                {% if board.description %}
+                                    <p class="board-desc">{{ board.description|truncatechars:120 }}</p>
+                                {% endif %}
+                            </div>
+                            <div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px;">
+                                <div class="board-meta">
+                                    <span>{{ board.columns.count }} colunas</span>
+                                    <span> • </span>
+                                    <span>{{ board.created_at|date:"d/m/Y" }}</span>
+                                </div>
+                                <a class="btn-secondary btn-open" href="{% url 'boards:detail' board.pk %}">Abrir quadro</a>
+                            </div>
+                    </div>
+                    {% endfor %}
+            </div>
+    {% else %}
+            <p class="empty-text">Você ainda não possui quadros cadastrados.</p>
+    {% endif %}
 </div>
 {% endblock %}
