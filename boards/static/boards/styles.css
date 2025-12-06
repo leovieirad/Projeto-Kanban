@@ -202,20 +202,20 @@ body.dark-mode .textarea {
 }
 
 .btn-primary {
-  width: 100%;
+  display: inline-block;
+  min-width: 140px;
   background: #4169e1;
-  padding: 12px;
+  padding: 10px 16px;
   border: none;
-  border-radius: 8px;
+  border-radius: 10px;
   color: #fff;
-  font-size: 16px;
+  font-size: 15px;
   cursor: pointer;
-  transition: 0.2s;
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+  box-shadow: 0 6px 18px rgba(65,105,225,0.14);
 }
 
-.btn-primary:hover {
-  background: #3158d1;
-}
+.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(65,105,225,0.18); }
 
 /* General button styles to cover .btn and bootstrap-like classes used in templates */
 .btn { font-weight: 600; border-radius: 8px; padding: 8px 12px; cursor: pointer; }
@@ -231,6 +231,55 @@ body.dark-mode .btn-link { color: #9fc1ff; }
 
 /* Make the big blue add buttons look centered and consistent */
 .btn-primary.full-width { display:block; text-align:center; width:100%; }
+
+/* Home page layout */
+.page { max-width: 1200px; margin: 0 auto; padding: 26px; }
+
+.header { align-items: center; gap: 16px; }
+.header .page-title { margin: 0; }
+.header .btn-primary { margin-left: auto; }
+
+.boards-grid {
+  display: grid;
+  gap: 22px;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  margin-top: 18px;
+}
+
+.board-card {
+  background: linear-gradient(180deg, #ffffff, #fbfcff);
+  border: 1px solid #e6e9ef;
+  padding: 22px;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(16,24,40,0.04);
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 120px;
+}
+
+.board-card h2 { margin: 0 0 12px 0; font-size: 20px; }
+
+.board-card:hover { transform: translateY(-6px); box-shadow: 0 20px 40px rgba(16,24,40,0.08); }
+
+.btn-secondary {
+  background: transparent;
+  color: #214b9a;
+  border: 1px solid rgba(33,75,154,0.08);
+  padding: 8px 12px;
+  border-radius: 8px;
+  text-decoration: none;
+  display: inline-block;
+}
+.btn-secondary:hover { background: rgba(33,75,154,0.04); }
+
+/* Responsive tweaks */
+@media (max-width: 720px) {
+  .header { flex-direction: column; align-items: stretch; }
+  .header .btn-primary { margin-left: 0; width: 100%; }
+  .page { padding: 16px; }
+}
 
 /* Kanban board layout */
 .board-columns {
