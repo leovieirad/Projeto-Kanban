@@ -55,6 +55,13 @@
 }
 
 /* Tipografia global */
+:root{
+  --primary: #6C5CE7; /* roxo moderno */
+  --primary-strong: #5844c7;
+  --accent: #00C2D1; /* ciano */
+  --muted: #6b7280;
+}
+
 body {
   font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "Liberation Sans", sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -90,8 +97,8 @@ input, textarea, .input, .textarea {
 
 input:focus, textarea:focus {
   outline: none;
-  box-shadow: 0 0 0 3px rgba(76,110,245,0.12);
-  border-color: #4c6ef5;
+  box-shadow: 0 0 0 3px rgba(108,92,231,0.12);
+  border-color: var(--primary);
 }
 
 /* Cabeçalho */
@@ -112,19 +119,19 @@ body.dark-mode .top-nav {
 
 /* Links no topo e geral (evita roxo de visited) */
 .top-nav a,
-a { color: #214b9a; text-decoration: none; }
+a { color: var(--primary); text-decoration: none; }
 
 .top-nav a:hover, a:hover { text-decoration: underline; }
 
 body.dark-mode .top-nav a,
-body.dark-mode a { color: #8fb3ff; }
+body.dark-mode a { color: #bfc8ff; }
 
 body.dark-mode a:visited, body.dark-mode .top-nav a:visited { color: #94b6ff; }
 
 /* Ajuste visual do topo para modo escuro */
 body.dark-mode .top-nav { background: #111214; }
 
-/* Reduce prominence of hr in dark mode */
+/* Reduz destaque do hr no modo escuro */
 body.dark-mode hr { border-color: #333; }
 
 #theme-toggle {
@@ -160,7 +167,7 @@ body.dark-mode .form-container {
   background: #2b2d31;
 }
 
-/* Improve look of inline edit form used in board_detail */
+/* Melhorar aparência do formulário inline usado em board_detail */
 #edit-board-form {
   max-width: 900px;
   margin: 12px 0 18px 0;
@@ -204,7 +211,7 @@ body.dark-mode .textarea {
 .btn-primary {
   display: inline-block;
   min-width: 140px;
-  background: #4169e1;
+  background: var(--primary);
   padding: 10px 16px;
   border: none;
   border-radius: 10px;
@@ -212,12 +219,12 @@ body.dark-mode .textarea {
   font-size: 15px;
   cursor: pointer;
   transition: transform 0.12s ease, box-shadow 0.12s ease;
-  box-shadow: 0 6px 18px rgba(65,105,225,0.14);
+  box-shadow: 0 6px 18px rgba(108,92,231,0.14);
 }
 
-.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(65,105,225,0.18); }
+.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(108,92,231,0.18); }
 
-/* General button styles to cover .btn and bootstrap-like classes used in templates */
+/* Estilos gerais de botões usados nos templates */
 .btn { font-weight: 600; border-radius: 8px; padding: 8px 12px; cursor: pointer; }
 
 .btn-success { background: #2ea44f; color: #fff; border: none; }
@@ -226,13 +233,13 @@ body.dark-mode .textarea {
 .btn-link { background: transparent; color: #214b9a; border: none; padding: 0; text-decoration: underline; }
 body.dark-mode .btn-link { color: #9fc1ff; }
 
-/* Small button variant used in templates */
+/* Variante de botão pequeno usada nos templates */
 .btn-sm { padding: 6px 10px; font-size: 14px; border-radius: 6px; }
 
-/* Make the big blue add buttons look centered and consistent */
+/* Aparência para botões grandes azuis (ex: adicionar) */
 .btn-primary.full-width { display:block; text-align:center; width:100%; }
 
-/* Home page layout */
+/* Layout da página inicial */
 .page { max-width: 1200px; margin: 0 auto; padding: 26px; }
 
 .header { align-items: center; gap: 16px; }
@@ -246,9 +253,10 @@ body.dark-mode .btn-link { color: #9fc1ff; }
   margin-top: 18px;
 }
 
+
 .board-card {
-  background: linear-gradient(180deg, #ffffff, #fbfcff);
-  border: 1px solid #e6e9ef;
+  background: linear-gradient(180deg, #ffffff, #f6f4ff);
+  border: 1px solid rgba(108,92,231,0.06);
   padding: 22px;
   border-radius: 12px;
   box-shadow: 0 8px 24px rgba(16,24,40,0.04);
@@ -261,9 +269,9 @@ body.dark-mode .btn-link { color: #9fc1ff; }
 
 .board-card h2 { margin: 0 0 12px 0; font-size: 20px; }
 
-.board-card:hover { transform: translateY(-6px); box-shadow: 0 20px 40px rgba(16,24,40,0.08); }
+.board-card:hover { transform: translateY(-6px); box-shadow: 0 20px 40px rgba(16,24,40,0.08); border-color: rgba(108,92,231,0.12); }
 
-/* Dark mode adjustments for board cards and buttons */
+/* Ajustes de modo escuro para cards de quadro e botões */
 body.dark-mode .board-card {
   background: linear-gradient(180deg, #151617, #0f1113);
   border: 1px solid #232427;
@@ -271,29 +279,30 @@ body.dark-mode .board-card {
   color: #e8eef6;
 }
 body.dark-mode .board-card h2 { color: #eef6ff; }
-body.dark-mode .btn-primary { background: #2f56f6; box-shadow: 0 6px 18px rgba(47,86,246,0.14); }
+body.dark-mode .btn-primary { background: #2f56f6; box-shadow: 0 6px 18px rgba(47,86,246,0.14); color: #fff; }
 body.dark-mode .btn-primary:hover { box-shadow: 0 10px 30px rgba(47,86,246,0.22); }
 body.dark-mode .btn-secondary { color: #bcd9ff; border-color: rgba(140,160,200,0.06); }
+body.dark-mode .btn-secondary:hover { background: rgba(255,255,255,0.03); }
 
 .btn-secondary {
   background: transparent;
-  color: #214b9a;
-  border: 1px solid rgba(33,75,154,0.08);
+  color: var(--primary);
+  border: 1px solid rgba(108,92,231,0.06);
   padding: 8px 12px;
   border-radius: 8px;
   text-decoration: none;
   display: inline-block;
 }
-.btn-secondary:hover { background: rgba(33,75,154,0.04); }
+.btn-secondary:hover { background: rgba(108,92,231,0.04); }
 
-/* Responsive tweaks */
+/* Ajustes responsivos */
 @media (max-width: 720px) {
   .header { flex-direction: column; align-items: stretch; }
   .header .btn-primary { margin-left: 0; width: 100%; }
   .page { padding: 16px; }
 }
 
-/* Kanban board layout */
+/* Layout Kanban */
 .board-columns {
   display: flex;
   gap: 18px;
@@ -345,12 +354,12 @@ body.dark-mode .kanban-card {
 
 .kanban-card.dragging { opacity: 0.6; }
 
-.kanban-list.drop-target { background: rgba(76,110,245,0.04); border-radius: 6px; }
+.kanban-list.drop-target { background: rgba(108,92,231,0.06); border-radius: 6px; }
 
 .card-meta { font-size: 12px; color: #666; margin-top:6px; }
 body.dark-mode .card-meta { color: #aaa; }
 
-/* Toast styles */
+/* Estilos das notificações (toasts) */
 .site-toast {
   display: inline-block;
   padding: 10px 14px;
@@ -366,7 +375,7 @@ body.dark-mode .site-toast { background: rgba(255,255,255,0.03); color: #eee; }
 body.dark-mode .site-toast.success { background: rgba(46,164,80,0.12); color: #c9ffd9; }
 body.dark-mode .site-toast.error { background: rgba(255,80,80,0.08); color: #ffd4d4; }
 
-/* Floating temporary toast container for JS notifications */
+/* Contêiner flutuante de notificações (canto superior direito) */
 .floating-toast {
   position: fixed;
   right: 18px;
