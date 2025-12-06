@@ -6,6 +6,7 @@ from django.views.generic import ListView, DetailView
 from .models import Board, Column, Card
 import json
 from django.db import transaction
+from django.views.decorators.http import require_http_methods
 
 class BoardListView(ListView):
     model = Board
@@ -82,6 +83,25 @@ def create_card(request, column_id):
         )
         messages.success(request, "Cartão criado.")
     return redirect("boards:detail", pk=column.board.id)
+
+
+@require_POST
+def delete_card(request, card_pk):
+    """Exclui um cartão e redireciona para o quadro pai."""
+    card = get_object_or_404(Card, pk=card_pk)
+    board_id = card.column.board.id
+    card.delete()
+    messages.success(request, "Cartão excluído.")
+    return redirect("boards:detail", pk=board_id)
+
+
+@require_POST
+def delete_board(request, pk):
+    """Exclui um quadro e redireciona para a lista de quadros."""
+    board = get_object_or_404(Board, pk=pk)
+    board.delete()
+    messages.success(request, "Quadro excluído.")
+    return redirect("boards:list")
 
 
 @require_POST

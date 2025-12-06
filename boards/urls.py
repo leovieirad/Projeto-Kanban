@@ -25,5 +25,7 @@ urlpatterns = [
     path("cartoes/<int:card_pk>/toggle-done/", toggle_card_done, name="toggle_card_done"),
 
     path("card/<int:card_id>/edit/", views.edit_card, name="edit_card"),
+    path("cartoes/<int:card_pk>/delete/", views.delete_card, name="delete_card"),
+    path("boards/<int:pk>/delete/", views.delete_board, name="delete_board"),
     path("api/cards/reorder/", views.reorder_cards, name="reorder_cards"),
 ]

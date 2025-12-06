@@ -273,14 +273,17 @@ body.dark-mode .search-input { background: #2b2d31; border: 1px solid #444; colo
   box-shadow: 0 8px 24px rgba(16,24,40,0.04);
   transition: transform 0.12s ease, box-shadow 0.12s ease;
   display: flex;
-  flex-direction: row;
-  justify-content: space-between;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
   min-height: 120px;
+  position: relative;
+  overflow: hidden;
 }
 
 .board-card h2 { margin: 0 0 12px 0; font-size: 20px; }
 .board-desc { margin: 8px 0 0 0; color: var(--muted); font-size: 14px; }
-.board-meta { font-size: 13px; color: var(--muted); }
+.board-meta { font-size: 13px; color: var(--muted); margin-top:8px; }
 
 .board-card:hover { transform: translateY(-6px); box-shadow: 0 20px 40px rgba(16,24,40,0.08); border-color: rgba(108,92,231,0.12); }
 
@@ -306,9 +309,28 @@ body.dark-mode .btn-secondary:hover { background: rgba(255,255,255,0.03); }
   text-decoration: none;
   display: inline-block;
 }
-.btn-new { padding: 12px 18px; font-size: 16px; background: var(--primary-strong); color: #fff; box-shadow: 0 8px 26px rgba(92,68,199,0.12); border-radius: 12px; }
+.btn-new { padding: 12px 18px; font-size: 16px; background: var(--primary-strong); color: #fff !important; box-shadow: 0 8px 26px rgba(92,68,199,0.12); border-radius: 12px; border: none; display: inline-flex; align-items: center; justify-content: center; }
 .btn-new:hover { transform: translateY(-2px); }
 .btn-open { min-width: 110px; text-align:center; }
+
+/* Botão de exclusão (perigo) */
+.btn-danger {
+  background: transparent;
+  border: 1px solid rgba(220,38,38,0.18);
+  color: #ff6b6b;
+  padding: 6px 10px;
+  border-radius: 8px;
+  font-size: 14px;
+  line-height: 1;
+  display: inline-block;
+}
+.btn-danger:hover { background: rgba(220,38,38,0.06); }
+
+/* Garantir texto branco do botão '+ Novo quadro' no modo escuro */
+body.dark-mode .btn-new { color: #fff !important; background: var(--primary-strong); box-shadow: 0 8px 28px rgba(88,68,199,0.16); }
+
+/* Forçar alinhamento / evitar vazamento dos botões dentro do card */
+.board-actions { display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin-top:12px; }
 .btn-secondary:hover { background: rgba(108,92,231,0.04); }
 
 /* Ajustes responsivos */

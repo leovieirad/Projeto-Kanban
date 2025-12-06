@@ -17,9 +17,15 @@
     </div>
 
     <!-- Botão Editar Quadro -->
-    <button id="btn-edit-board" class="btn btn-primary mb-3">
-        Editar quadro
-    </button>
+    <div style="display:flex;gap:10px;margin-bottom:12px;align-items:center;">
+        <button id="btn-edit-board" class="btn btn-primary">
+            Editar quadro
+        </button>
+        <form method="post" action="{% url 'boards:delete_board' board.id %}" onsubmit="return confirm('Deseja realmente excluir este quadro?');">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-danger">Excluir quadro</button>
+        </form>
+    </div>
 
     <!-- Formulário escondido -->
     <div id="edit-board-form" style="display: none;">
@@ -52,9 +58,13 @@
                 <div class="kanban-card" draggable="true" data-card-id="{{ card.id }}">
                     <div class="card-title"><strong>{{ card.title }}</strong></div>
                     <div class="card-desc">{{ card.description }}</div>
-                    <div class="card-actions">
-                        <button class="btn btn-sm btn-link" onclick="toggleCardForm({{ card.id }})">Editar</button>
-                    </div>
+                        <div class="card-actions" style="display:flex;gap:8px;margin-top:8px;">
+                            <button class="btn btn-sm btn-link" onclick="toggleCardForm({{ card.id }})">Editar</button>
+                            <form method="post" action="{% url 'boards:delete_card' card.id %}" onsubmit="return confirm('Excluir cartão?');" style="margin:0;">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-sm btn-danger">Excluir</button>
+                            </form>
+                        </div>
 
                     <div id="card-form-{{ card.id }}" style="display:none; margin-top:8px;">
                         <form method="POST" action="{% url 'boards:edit_card' card.id %}">

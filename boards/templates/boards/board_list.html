@@ -16,20 +16,18 @@
             <div class="boards-grid">
                     {% for board in boards %}
                     <div class="board-card">
-                            <div>
-                                <h2>{{ board.title }}</h2>
-                                {% if board.description %}
-                                    <p class="board-desc">{{ board.description|truncatechars:120 }}</p>
-                                {% endif %}
-                            </div>
-                            <div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px;">
-                                <div class="board-meta">
-                                    <span>{{ board.columns.count }} colunas</span>
-                                    <span> • </span>
-                                    <span>{{ board.created_at|date:"d/m/Y" }}</span>
-                                </div>
-                                <a class="btn-secondary btn-open" href="{% url 'boards:detail' board.pk %}">Abrir quadro</a>
-                            </div>
+                        <h2>{{ board.title }}</h2>
+                        {% if board.description %}
+                            <p class="board-desc">{{ board.description|truncatechars:120 }}</p>
+                        {% endif %}
+                        <div class="board-meta">{{ board.created_at|date:"d/m/Y" }}</div>
+                        <div class="board-actions" style="display:flex;gap:8px;margin-top:12px;">
+                            <a class="btn-secondary btn-open" href="{% url 'boards:detail' board.pk %}">Abrir quadro</a>
+                            <form method="post" action="{% url 'boards:delete_board' board.pk %}" onsubmit="return confirm('Deseja realmente excluir este quadro?');">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-danger">Excluir</button>
+                            </form>
+                        </div>
                     </div>
                     {% endfor %}
             </div>
