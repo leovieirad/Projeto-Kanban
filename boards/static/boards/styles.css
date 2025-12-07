@@ -340,6 +340,21 @@ body.dark-mode .btn-new { color: #fff !important; background: var(--primary-stro
   .page { padding: 16px; }
 }
 
+/* Mensagem de resultado vazio por busca */
+.empty-result {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.04);
+  color: var(--muted);
+  padding: 20px;
+  border-radius: 12px;
+  text-align: center;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.35);
+  margin-top: 18px;
+}
+.empty-result h3 { margin: 0 0 8px 0; color: #fff; }
+.empty-result p { margin: 6px 0; color: #cfcfcf; }
+.empty-result kbd { background: rgba(0,0,0,0.2); padding: 2px 6px; border-radius: 4px; color: #fff; }
+
 /* Layout Kanban */
 .board-columns {
   display: flex;
@@ -347,6 +362,24 @@ body.dark-mode .btn-new { color: #fff !important; background: var(--primary-stro
   align-items: flex-start;
   margin-top: 18px;
 }
+
+.board-column { flex: 1 1 0; max-width: 360px; }
+
+.col-header {
+  padding: 12px 14px;
+  color: #fff;
+  font-weight: 700;
+  border-radius: 8px 8px 0 0;
+  text-align: center;
+  margin-bottom: 10px;
+}
+.col-afazer .col-header { background: linear-gradient(90deg, #1E90FF, #4682FF); }
+.col-progress .col-header { background: linear-gradient(90deg, #FFC107, #FFB300); color: #222; }
+.col-feito .col-header { background: linear-gradient(90deg, #34D399, #10B981); }
+
+.board-column .kanban-list { background: rgba(255,255,255,0.02); padding: 12px; border-radius: 8px; min-height: 220px; }
+.board-column .kanban-card { background: #fff; color: #111; }
+body.dark-mode .board-column .kanban-card { background: #0f1113; color: #e8eef6; }
 
 .board-column {
   background: rgba(255,255,255,0.95);

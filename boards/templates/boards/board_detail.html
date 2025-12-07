@@ -7,14 +7,7 @@
     <h1>{{ board.title }}</h1>
     <p>{{ board.description }}</p>
 
-    <!-- Criar nova coluna -->
-    <div style="margin:12px 0;">
-        <form method="POST" action="{% url 'boards:create_column' board.id %}" style="display:flex;gap:8px;align-items:center;max-width:480px;">
-            {% csrf_token %}
-            <input type="text" name="title" placeholder="Nova coluna (ex: To Do)" class="form-control" style="flex:1;"/>
-            <button type="submit" class="btn btn-secondary">Criar coluna</button>
-        </form>
-    </div>
+    <!-- As colunas são fixas: A Fazer / Em Progresso / Feito. A criação de novas colunas foi desabilitada. -->
 
     <!-- Botão Editar Quadro -->
     <div style="display:flex;gap:10px;margin-bottom:12px;align-items:center;">
@@ -49,15 +42,16 @@
     </div>
 
     <div class="board-columns">
-        {% for column in board.columns.all %}
-        <div class="board-column" data-column-id="{{ column.id }}">
-            <h4>{{ column.title }}</h4>
+        {% for c in kanban_columns %}
+        <div class="board-column col-{{ c.key }}" data-column-id="{% if c.column %}{{ c.column.id }}{% else %}0{% endif %}" data-column-key="{{ c.key }}">
+            <div class="col-header col-{{ c.key }}">{{ c.display_name }}</div>
 
-            <div class="kanban-list" data-column-id="{{ column.id }}">
-                {% for card in column.cards.all %}
-                <div class="kanban-card" draggable="true" data-card-id="{{ card.id }}">
-                    <div class="card-title"><strong>{{ card.title }}</strong></div>
-                    <div class="card-desc">{{ card.description }}</div>
+            <div class="kanban-list" data-column-key="{{ c.key }}">
+                {% if c.cards %}
+                    {% for card in c.cards %}
+                    <div class="kanban-card" draggable="true" data-card-id="{{ card.id }}">
+                        <div class="card-title"><strong>{{ card.title }}</strong></div>
+                        <div class="card-desc">{{ card.description }}</div>
                         <div class="card-actions" style="display:flex;gap:8px;margin-top:8px;">
                             <button class="btn btn-sm btn-link" onclick="toggleCardForm({{ card.id }})">Editar</button>
                             <form method="post" action="{% url 'boards:delete_card' card.id %}" onsubmit="return confirm('Excluir cartão?');" style="margin:0;">
@@ -66,29 +60,32 @@
                             </form>
                         </div>
 
-                    <div id="card-form-{{ card.id }}" style="display:none; margin-top:8px;">
-                        <form method="POST" action="{% url 'boards:edit_card' card.id %}">
-                            {% csrf_token %}
-                            <input type="text" name="title" value="{{ card.title }}" class="form-control mb-2">
-                            <textarea name="description" class="form-control mb-2">{{ card.description }}</textarea>
-                            <button type="submit" class="btn btn-success btn-sm">Salvar</button>
-                        </form>
+                        <div id="card-form-{{ card.id }}" style="display:none; margin-top:8px;">
+                            <form method="POST" action="{% url 'boards:edit_card' card.id %}">
+                                {% csrf_token %}
+                                <input type="text" name="title" value="{{ card.title }}" class="form-control mb-2">
+                                <textarea name="description" class="form-control mb-2">{{ card.description }}</textarea>
+                                <button type="submit" class="btn btn-success btn-sm">Salvar</button>
+                            </form>
+                        </div>
                     </div>
-                </div>
-                {% empty %}
-                <div class="card-empty"><i>Nenhum cartão.</i></div>
-                {% endfor %}
+                    {% endfor %}
+                {% else %}
+                    <div class="card-empty"><i>Nenhum cartão.</i></div>
+                {% endif %}
             </div>
 
-            <button class="btn btn-primary full-width" onclick="toggleNewCardForm({{ column.id }})">+ Adicionar cartão</button>
-            <div id="new-card-{{ column.id }}" style="display:none; margin-top:8px;">
-                <form method="POST" action="{% url 'boards:create_card' column.id %}">
-                    {% csrf_token %}
-                    <input type="text" name="title" class="form-control mb-2" placeholder="Título do cartão">
-                    <textarea name="description" class="form-control mb-2" placeholder="Descrição"></textarea>
-                    <button type="submit" class="btn btn-success btn-sm">Criar</button>
-                </form>
-            </div>
+            {% if c.column %}
+                <button class="btn btn-primary full-width" onclick="toggleNewCardForm({{ c.column.id }})">+ Adicionar cartão</button>
+                <div id="new-card-{{ c.column.id }}" style="display:none; margin-top:8px;">
+                    <form method="POST" action="{% url 'boards:create_card' c.column.id %}">
+                        {% csrf_token %}
+                        <input type="text" name="title" class="form-control mb-2" placeholder="Título do cartão">
+                        <textarea name="description" class="form-control mb-2" placeholder="Descrição"></textarea>
+                        <button type="submit" class="btn btn-success btn-sm">Criar</button>
+                    </form>
+                </div>
+            {% endif %}
         </div>
         {% endfor %}
     </div>
@@ -201,6 +198,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const columns = [];
         document.querySelectorAll('.board-column').forEach(function(col){
             const colId = parseInt(col.dataset.columnId);
+            if (isNaN(colId) || colId <= 0) return; // ignorar colunas sem id real
             const cards = [];
             col.querySelectorAll('.kanban-card').forEach(function(card){
                 cards.push(parseInt(card.dataset.cardId));

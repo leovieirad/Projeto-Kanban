@@ -25,6 +25,53 @@ class BoardDetailView(DetailView):
     model = Board
     template_name = "boards/board_detail.html"
     context_object_name = "board"
+    
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        board = self.get_object()
+
+        # Definir colunas padrão a exibir na ordem desejada.
+        desired = [
+            ("A Fazer", "afazer"),
+            ("Em Progresso", "progress"),
+            ("Feito", "feito"),
+        ]
+
+        def find_column_by_keywords(board, keywords):
+            qs = board.columns.all()
+            # procura exata
+            col = qs.filter(title__iexact=keywords).first()
+            if col:
+                return col
+            # procura por palavras-chave (icontains)
+            kws = [keywords]
+            # normalizar algumas variações
+            if keywords.lower().startswith('a') and 'fazer' in keywords.lower():
+                kws = ['fazer', 'a fazer', 'to do']
+            if 'progresso' in keywords.lower() or 'progress' in keywords.lower():
+                kws = ['progresso', 'fazendo', 'em progresso', 'doing', 'in progress']
+            if 'feito' in keywords.lower() or 'done' in keywords.lower():
+                kws = ['feito', 'concluido', 'concluído', 'done']
+
+            for k in kws:
+                col = qs.filter(title__icontains=k).first()
+                if col:
+                    return col
+            return None
+
+        kanban_columns = []
+        for display_name, key in desired:
+            col = find_column_by_keywords(board, display_name)
+            cards = col.cards.all() if col else []
+            kanban_columns.append({
+                'key': key,
+                'display_name': display_name,
+                'column': col,
+                'cards': cards,
+            })
+
+        ctx['kanban_columns'] = kanban_columns
+        return ctx
 
 def create_board(request):
     if request.method == "POST":
