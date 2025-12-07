@@ -32,7 +32,78 @@
                     {% endfor %}
             </div>
     {% else %}
-            <p class="empty-text">Você ainda não possui quadros cadastrados.</p>
+            {% if request.GET.q %}
+                <div class="empty-result">
+                    <h3>Nenhum quadro encontrado</h3>
+                    <p>Não foi encontrado nenhum quadro para "<strong>{{ request.GET.q|escape }}</strong>".</p>
+                    <p>Tente outro termo ou clique no campo de busca e pressione <kbd>Esc</kbd> ou no botão <em>X</em> para limpar e voltar à lista completa.</p>
+                </div>
+            {% else %}
+                <p class="empty-text">Você ainda não possui quadros cadastrados.</p>
+            {% endif %}
     {% endif %}
 </div>
 {% endblock %}
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const input = document.querySelector('.search-input');
+    if (!input) return;
+
+    const DEBOUNCE_MS = 250;
+    let timer = null;
+
+    function buildUrl(q) {
+        const base = window.location.pathname;
+        if (!q) return base;
+        return base + '?q=' + encodeURIComponent(q);
+    }
+
+    const form = input.closest('form');
+    function goToQuery(q) {
+        // Prefer submitting the form (GET) to keep behavior consistent.
+        if (form) {
+            // if q is empty, clear input and submit to base
+            input.value = q || '';
+            try { form.submit(); return; } catch (e) { /* fallback to assign */ }
+        }
+        const url = buildUrl(q);
+        window.location.assign(url);
+    }
+
+    let prevVal = input.value || '';
+    input.addEventListener('input', function () {
+        const cur = input.value || '';
+        // If it became empty (user clicked X or cleared), navigate immediately to base
+        if (prevVal.length > 0 && cur.length === 0) {
+            goToQuery('');
+            prevVal = cur;
+            return;
+        }
+
+        clearTimeout(timer);
+        timer = setTimeout(() => {
+            const v = cur.trim();
+            // Only navigate if non-empty
+            goToQuery(v);
+        }, DEBOUNCE_MS);
+
+        prevVal = cur;
+    });
+
+    // Some browsers emit a 'search' event when the native X is used — handle it explicitly
+    input.addEventListener('search', function () {
+        if ((input.value || '').length === 0) {
+            goToQuery('');
+        }
+    });
+
+    // ESC to clear immediately
+    input.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') {
+            input.value = '';
+            goToQuery('');
+        }
+    });
+});
+</script>

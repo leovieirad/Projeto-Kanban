@@ -340,6 +340,21 @@ body.dark-mode .btn-new { color: #fff !important; background: var(--primary-stro
   .page { padding: 16px; }
 }
 
+/* Mensagem de resultado vazio por busca */
+.empty-result {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.04);
+  color: var(--muted);
+  padding: 20px;
+  border-radius: 12px;
+  text-align: center;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.35);
+  margin-top: 18px;
+}
+.empty-result h3 { margin: 0 0 8px 0; color: #fff; }
+.empty-result p { margin: 6px 0; color: #cfcfcf; }
+.empty-result kbd { background: rgba(0,0,0,0.2); padding: 2px 6px; border-radius: 4px; color: #fff; }
+
 /* Layout Kanban */
 .board-columns {
   display: flex;
