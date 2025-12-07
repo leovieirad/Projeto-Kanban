@@ -25,7 +25,7 @@
                             <a class="btn-secondary btn-open" href="{% url 'boards:detail' board.pk %}">Abrir quadro</a>
                             <form method="post" action="{% url 'boards:delete_board' board.pk %}" onsubmit="return confirm('Deseja realmente excluir este quadro?');">
                                 {% csrf_token %}
-                                <button type="submit" class="btn btn-danger">Excluir</button>
+                                <button type="submit" class="btn btn-danger btn-open">Excluir quadro</button>
                             </form>
                         </div>
                     </div>
@@ -61,9 +61,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
     const form = input.closest('form');
     function goToQuery(q) {
-        // Prefer submitting the form (GET) to keep behavior consistent.
+        // Preferir submeter o formulário (GET) para manter comportamento consistente.
         if (form) {
-            // if q is empty, clear input and submit to base
+            // se q estiver vazio, limpar o campo e submeter para a URL base
             input.value = q || '';
             try { form.submit(); return; } catch (e) { /* fallback to assign */ }
         }
@@ -74,7 +74,7 @@ document.addEventListener('DOMContentLoaded', function () {
     let prevVal = input.value || '';
     input.addEventListener('input', function () {
         const cur = input.value || '';
-        // If it became empty (user clicked X or cleared), navigate immediately to base
+        // Se ficou vazio (usuário clicou no X ou limpou), navegar imediatamente para a URL base
         if (prevVal.length > 0 && cur.length === 0) {
             goToQuery('');
             prevVal = cur;
@@ -84,21 +84,21 @@ document.addEventListener('DOMContentLoaded', function () {
         clearTimeout(timer);
         timer = setTimeout(() => {
             const v = cur.trim();
-            // Only navigate if non-empty
+            // Navegar apenas se o valor não estiver vazio
             goToQuery(v);
         }, DEBOUNCE_MS);
 
         prevVal = cur;
     });
 
-    // Some browsers emit a 'search' event when the native X is used — handle it explicitly
+    // Alguns navegadores disparam o evento 'search' quando o X nativo é usado — tratar explicitamente
     input.addEventListener('search', function () {
         if ((input.value || '').length === 0) {
             goToQuery('');
         }
     });
 
-    // ESC to clear immediately
+    // ESC para limpar imediatamente
     input.addEventListener('keydown', function (e) {
         if (e.key === 'Escape') {
             input.value = '';

@@ -16,7 +16,7 @@
         </button>
         <form method="post" action="{% url 'boards:delete_board' board.id %}" onsubmit="return confirm('Deseja realmente excluir este quadro?');">
             {% csrf_token %}
-            <button type="submit" class="btn btn-danger">Excluir quadro</button>
+            <button type="submit" class="btn btn-danger btn-primary">Excluir quadro</button>
         </form>
     </div>
 
@@ -121,7 +121,7 @@ document.addEventListener('DOMContentLoaded', function () {
         div.style.display = div.style.display === "none" || div.style.display === "" ? "block" : "none";
     };
 
-    // Comportamento de arrastar e soltar (Drag and Drop)
+    // Comportamento de arrastar e soltar (arrastar e soltar)
     let dragged = null;
 
     function onDragStart(e) {
@@ -152,7 +152,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const cardId = e.dataTransfer.getData('text/plain');
         const cardElem = document.querySelector('[data-card-id="' + cardId + '"]');
         if (!cardElem) return;
-        // Append at drop target (end)
+        // Anexa ao destino do drop (final)
         this.appendChild(cardElem);
         saveBoardOrder();
     }
@@ -175,7 +175,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // Save order via AJAX
+    // Salvar ordem via requisição AJAX
     function getCsrfToken() {
         function getCookie(name) {
             let cookieValue = null;
@@ -229,7 +229,7 @@ document.addEventListener('DOMContentLoaded', function () {
           });
     }
 
-    // Simple floating toast for AJAX feedback
+    // Notificação flutuante simples para feedback de requisições AJAX
     function showToast(message, type) {
         try {
             let container = document.querySelector('.floating-toast');
@@ -246,7 +246,7 @@ document.addEventListener('DOMContentLoaded', function () {
         } catch(e) { console.warn('toast fail', e); }
     }
 
-    // Attach DnD after initial render
+    // Anexar eventos de arrastar/soltar após renderização inicial
     attachDnD();
 });
 </script>

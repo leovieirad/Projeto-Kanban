@@ -311,7 +311,14 @@ body.dark-mode .btn-secondary:hover { background: rgba(255,255,255,0.03); }
 }
 .btn-new { padding: 12px 18px; font-size: 16px; background: var(--primary-strong); color: #fff !important; box-shadow: 0 8px 26px rgba(92,68,199,0.12); border-radius: 12px; border: none; display: inline-flex; align-items: center; justify-content: center; }
 .btn-new:hover { transform: translateY(-2px); }
-.btn-open { min-width: 110px; text-align:center; }
+.btn-open {
+  min-width: 110px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 14px; /* match .btn-secondary spacing */
+  text-align: center;
+}
 
 /* Botão de exclusão (perigo) */
 .btn-danger {
@@ -332,6 +339,23 @@ body.dark-mode .btn-new { color: #fff !important; background: var(--primary-stro
 /* Forçar alinhamento / evitar vazamento dos botões dentro do card */
 .board-actions { display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin-top:12px; }
 .btn-secondary:hover { background: rgba(108,92,231,0.04); }
+
+/* Normalizar alinhamento vertical dos botões dentro da área de ações */
+.board-actions .btn,
+.board-actions a,
+.board-actions button {
+  margin-top: 0 !important; /* remove any margin-top coming from global button variants */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
+/* Garantir que as variantes .btn-open e .btn-danger compartilhem o mesmo border-radius e baseline visual */
+.board-actions .btn-open,
+.board-actions .btn-danger {
+  border-radius: 8px;
+}
 
 /* Ajustes responsivos */
 @media (max-width: 720px) {
@@ -514,8 +538,8 @@ body.dark-mode .floating-toast .toast-item { background: rgba(255,255,255,0.06);
 body.dark-mode .floating-toast .toast-item.success { background: rgba(46,164,80,0.14); color: #eaffea; }
 body.dark-mode .floating-toast .toast-item.error { background: rgba(215,58,73,0.12); color: #ffdfe0; }
 
-/* === Overrides: full-width stripe, larger gaps, and column-colored add buttons === */
-/* Ensure the colored stripe spans the whole card width and sits at the card's top */
+/* === Sobrescritas: faixa superior em toda a largura, espaçamento maior e botões por coluna === */
+/* Garantir que a faixa colorida ocupe toda a largura do cartão e fique no topo */
 .board-column .kanban-card::before {
   position: absolute !important;
   left: 0 !important;
@@ -527,18 +551,18 @@ body.dark-mode .floating-toast .toast-item.error { background: rgba(215,58,73,0.
   z-index: 2;
 }
 
-/* Specific gradients for each column (reuse header colors) */
+/* Gradientes específicos para cada coluna (reutiliza as cores do cabeçalho) */
 .col-afazer .kanban-card::before { background: linear-gradient(90deg, #1E90FF, #4682FF); }
 .col-progress .kanban-card::before { background: linear-gradient(90deg, #FFC107, #FFB300); }
 .col-feito .kanban-card::before   { background: linear-gradient(90deg, #34D399, #10B981); }
 
-/* Make room for the stripe so card content isn't covered */
+/* Criar espaço para a faixa para que o conteúdo do cartão não fique coberto */
 .board-column .kanban-card { padding-top: 18px; }
 
-/* Increase vertical spacing between cards */
+/* Aumentar espaçamento vertical entre os cartões */
 .board-column .kanban-list { gap: 18px !important; }
 
-/* Color the '+ Adicionar cartão' full-width button per column */
+/* Colorir o botão '+ Adicionar cartão' (full-width) por coluna */
 .col-afazer .btn-primary.full-width {
   background: linear-gradient(90deg, #1E90FF, #4682FF);
   box-shadow: 0 8px 22px rgba(70,130,255,0.12);
@@ -560,8 +584,31 @@ body.dark-mode .floating-toast .toast-item.error { background: rgba(215,58,73,0.
 }
 .col-feito .btn-primary.full-width:hover { transform: translateY(-2px); }
 
-/* Ensure buttons look good in dark mode */
+/* Garantir que os botões apareçam bem no modo escuro */
 body.dark-mode .col-afazer .btn-primary.full-width { box-shadow: 0 8px 22px rgba(30,144,255,0.08); }
 body.dark-mode .col-progress .btn-primary.full-width { box-shadow: 0 8px 22px rgba(255,193,7,0.06); }
 body.dark-mode .col-feito .btn-primary.full-width { box-shadow: 0 8px 22px rgba(34,197,94,0.08); }
+
+/* Garantir que botões de perigo possam compartilhar o tamanho do primário quando combinados */
+.btn-danger.btn-primary {
+  min-width: 140px; /* igual a .btn-primary */
+  padding: 10px 16px;
+  border-radius: 10px;
+}
+
+/* Garantir que botões de perigo com .btn-open combinem o tamanho do botão 'Abrir' */
+/* .btn-open fornece tamanho/espacamento para botões 'Abrir' e 'Excluir' quando aplicado */
+
+/* Normalizar aparência e altura de .btn-open entre variantes (secondary/danger) */
+.btn-open,
+.btn-secondary.btn-open,
+.btn-danger.btn-open,
+button.btn-open {
+  padding: 8px 14px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  min-height: 40px !important;
+  box-sizing: border-box !important;
+}
 
