@@ -358,12 +358,13 @@ body.dark-mode .btn-new { color: #fff !important; background: var(--primary-stro
 /* Layout Kanban */
 .board-columns {
   display: flex;
-  gap: 18px;
+  gap: 24px;
   align-items: flex-start;
+  justify-content: center; /* centraliza as colunas na página */
   margin-top: 18px;
 }
 
-.board-column { flex: 1 1 0; max-width: 360px; }
+.board-column { flex: 0 0 320px; max-width: 320px; }
 
 .col-header {
   padding: 12px 14px;
@@ -377,9 +378,45 @@ body.dark-mode .btn-new { color: #fff !important; background: var(--primary-stro
 .col-progress .col-header { background: linear-gradient(90deg, #FFC107, #FFB300); color: #222; }
 .col-feito .col-header { background: linear-gradient(90deg, #34D399, #10B981); }
 
-.board-column .kanban-list { background: rgba(255,255,255,0.02); padding: 12px; border-radius: 8px; min-height: 220px; }
-.board-column .kanban-card { background: #fff; color: #111; }
+.board-column .kanban-list { background: rgba(255,255,255,0.02); padding: 12px; border-radius: 8px; min-height: 220px; display:flex; flex-direction:column; gap:12px; }
+.board-column .kanban-card { background: #fff; color: #111; border-radius:10px; padding:14px 12px; box-shadow: 0 6px 18px rgba(16,24,40,0.06); position:relative; overflow:visible; }
 body.dark-mode .board-column .kanban-card { background: #0f1113; color: #e8eef6; }
+
+/* Faixa colorida no topo do cartão — reutiliza as cores das colunas */
+.col-afazer .kanban-card::before,
+.col-afazer .kanban-card::after {
+  content: '';
+}
+.col-afazer .kanban-card::before {
+  position: absolute;
+  left: 12px;
+  right: 12px;
+  top: -10px;
+  height: 10px;
+  border-radius: 8px 8px 0 0;
+  background: linear-gradient(90deg, #1E90FF, #4682FF);
+}
+.col-progress .kanban-card::before {
+  position: absolute;
+  left: 12px;
+  right: 12px;
+  top: -10px;
+  height: 10px;
+  border-radius: 8px 8px 0 0;
+  background: linear-gradient(90deg, #FFC107, #FFB300);
+}
+.col-feito .kanban-card::before {
+  position: absolute;
+  left: 12px;
+  right: 12px;
+  top: -10px;
+  height: 10px;
+  border-radius: 8px 8px 0 0;
+  background: linear-gradient(90deg, #34D399, #10B981);
+}
+
+/* Ajuste interno para que o conteúdo do cartão não fique encoberto pelo ::before */
+.kanban-card .card-title { margin-top: 4px; }
 
 .board-column {
   background: rgba(255,255,255,0.95);
@@ -476,3 +513,55 @@ body.dark-mode .site-toast.error { background: rgba(255,80,80,0.08); color: #ffd
 body.dark-mode .floating-toast .toast-item { background: rgba(255,255,255,0.06); color: #eee; }
 body.dark-mode .floating-toast .toast-item.success { background: rgba(46,164,80,0.14); color: #eaffea; }
 body.dark-mode .floating-toast .toast-item.error { background: rgba(215,58,73,0.12); color: #ffdfe0; }
+
+/* === Overrides: full-width stripe, larger gaps, and column-colored add buttons === */
+/* Ensure the colored stripe spans the whole card width and sits at the card's top */
+.board-column .kanban-card::before {
+  position: absolute !important;
+  left: 0 !important;
+  right: 0 !important;
+  top: 0 !important;
+  height: 12px !important;
+  border-radius: 8px 8px 0 0 !important;
+  content: '' !important;
+  z-index: 2;
+}
+
+/* Specific gradients for each column (reuse header colors) */
+.col-afazer .kanban-card::before { background: linear-gradient(90deg, #1E90FF, #4682FF); }
+.col-progress .kanban-card::before { background: linear-gradient(90deg, #FFC107, #FFB300); }
+.col-feito .kanban-card::before   { background: linear-gradient(90deg, #34D399, #10B981); }
+
+/* Make room for the stripe so card content isn't covered */
+.board-column .kanban-card { padding-top: 18px; }
+
+/* Increase vertical spacing between cards */
+.board-column .kanban-list { gap: 18px !important; }
+
+/* Color the '+ Adicionar cartão' full-width button per column */
+.col-afazer .btn-primary.full-width {
+  background: linear-gradient(90deg, #1E90FF, #4682FF);
+  box-shadow: 0 8px 22px rgba(70,130,255,0.12);
+  color: #fff;
+}
+.col-afazer .btn-primary.full-width:hover { transform: translateY(-2px); }
+
+.col-progress .btn-primary.full-width {
+  background: linear-gradient(90deg, #FFC107, #FFB300);
+  box-shadow: 0 8px 22px rgba(255,193,7,0.12);
+  color: #111;
+}
+.col-progress .btn-primary.full-width:hover { transform: translateY(-2px); }
+
+.col-feito .btn-primary.full-width {
+  background: linear-gradient(90deg, #34D399, #10B981);
+  box-shadow: 0 8px 22px rgba(16,185,129,0.12);
+  color: #fff;
+}
+.col-feito .btn-primary.full-width:hover { transform: translateY(-2px); }
+
+/* Ensure buttons look good in dark mode */
+body.dark-mode .col-afazer .btn-primary.full-width { box-shadow: 0 8px 22px rgba(30,144,255,0.08); }
+body.dark-mode .col-progress .btn-primary.full-width { box-shadow: 0 8px 22px rgba(255,193,7,0.06); }
+body.dark-mode .col-feito .btn-primary.full-width { box-shadow: 0 8px 22px rgba(34,197,94,0.08); }
+
