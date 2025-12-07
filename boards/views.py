@@ -3,6 +3,7 @@ from django.views.decorators.http import require_POST
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
 from django.views.generic import ListView, DetailView
+from django.db.models import Q
 from .models import Board, Column, Card
 import json
 from django.db import transaction
@@ -12,6 +13,13 @@ class BoardListView(ListView):
     model = Board
     template_name = "boards/board_list.html"
     context_object_name = "boards"
+    
+    def get_queryset(self):
+        qs = super().get_queryset()
+        q = self.request.GET.get('q', '').strip()
+        if q:
+            qs = qs.filter(Q(title__icontains=q) | Q(description__icontains=q))
+        return qs
 
 class BoardDetailView(DetailView):
     model = Board
