@@ -14,7 +14,8 @@
 .boards-grid {
   display: grid;
   gap: 20px;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  /* Limita a, no máximo, 2 quadros por linha. Em telas menores (veja media query abaixo) fica 1 coluna. */
+  grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
 .board-card {
@@ -260,8 +261,14 @@ body.dark-mode .search-input { background: #2b2d31; border: 1px solid #444; colo
 .boards-grid {
   display: grid;
   gap: 22px;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  /* Limita a, no máximo, 2 quadros por linha na versão refinada do layout */
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   margin-top: 18px;
+}
+
+/* Responsivo: em telas menores, mostrar um único quadro por linha */
+@media (max-width: 780px) {
+  .boards-grid { grid-template-columns: 1fr; }
 }
 
 
