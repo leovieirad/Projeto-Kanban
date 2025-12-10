@@ -509,8 +509,8 @@ body.dark-mode .site-toast.error { background: rgba(255,80,80,0.08); color: #ffd
 /* Contêiner flutuante de notificações (canto superior direito) */
 .floating-toast {
   position: fixed;
-  right: 65px;
-  top: 16px;
+  right: 120px;
+  top: 18px;
   z-index: 2200;
   display: flex;
   flex-direction: column;
