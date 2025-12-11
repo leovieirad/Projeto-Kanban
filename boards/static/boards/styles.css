@@ -330,6 +330,19 @@ body.dark-mode .btn-secondary:hover { background: rgba(255,255,255,0.03); }
   line-height: 1;
   display: inline-block;
 }
+
+
+/* Garantir que o botão de exclusão fique consistente no modo escuro */
+body.dark-mode .btn-danger {
+  background: transparent;
+  border: 1px solid rgba(255,107,107,0.25);
+  color: #ff6b6b;
+}
+body.dark-mode .btn-danger:hover {
+  background: rgba(255,107,107,0.08);
+}
+
+
 .btn-danger:hover { background: rgba(220,38,38,0.06); }
 
 /* Garantir texto branco do botão '+ Novo quadro' no modo escuro */
