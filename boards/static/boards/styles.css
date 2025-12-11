@@ -831,3 +831,14 @@ button.btn-open {
     bottom: -4.062em;
 }
 
+/* input e textarea do form Novo Quadro */
+.form-container form .input,
+.form-container form .textarea {
+    display: block !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    width: 96% !important;       
+    max-width: 600px !important; 
+}
+
+

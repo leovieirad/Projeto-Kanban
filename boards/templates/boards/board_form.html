@@ -5,13 +5,16 @@
     <h1>Novo Quadro</h1>
 
     <form method="post" action="{% url 'boards:create_board' %}">
+
         {% csrf_token %}
 
-        <label for="id_title">Título</label>
-        <input type="text" name="title" id="id_title" class="input" placeholder="Título do quadro" required>
+        <div class="form-fields">
+            <label for="id_title">Título</label>
+            <input type="text" name="title" id="id_title" class="input" placeholder="Título do quadro" required>
 
-        <label for="id_description">Descrição</label>
-        <textarea name="description" id="id_description" class="textarea" placeholder="Descrição opcional"></textarea>
+            <label for="id_description">Descrição</label>
+            <textarea name="description" id="id_description" class="textarea" placeholder="Descrição opcional"></textarea>
+        </div>
 
         <button type="submit" class="btn-primary">Criar Quadro</button>
     </form>
