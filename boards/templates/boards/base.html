@@ -59,5 +59,23 @@
 
 <script src="{% static 'boards/theme.js' %}"></script>
 
+<!-- Desaparecer notificações -->
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const toasts = document.querySelectorAll('.toast-item');
+
+    toasts.forEach(toast => {
+        // Tempo até começar a desaparecer (ms)
+        const timeout = 2500;
+
+        setTimeout(() => {
+            toast.classList.add('fade-out');
+
+            // Remove do DOM após a animação
+            setTimeout(() => toast.remove(), 600);
+        }, timeout);
+    });
+});
+</script>
 </body>
 </html>

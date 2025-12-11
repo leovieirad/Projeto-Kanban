@@ -506,6 +506,18 @@ body.dark-mode .site-toast { background: rgba(255,255,255,0.03); color: #eee; }
 body.dark-mode .site-toast.success { background: rgba(46,164,80,0.12); color: #c9ffd9; }
 body.dark-mode .site-toast.error { background: rgba(255,80,80,0.08); color: #ffd4d4; }
 
+
+/* Animações de entrada/saída das notificações */
+.toast-item {
+    opacity: 1;
+    transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+.toast-item.fade-out {
+    opacity: 0;
+    transform: translateY(-10px);
+}
+
 /* Contêiner flutuante de notificações (canto superior direito) */
 .floating-toast {
   position: fixed;
