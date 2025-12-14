@@ -155,9 +155,9 @@ a { color: var(--primary); text-decoration: none; }
 .top-nav a:hover, a:hover { text-decoration: underline; }
 
 body.dark-mode .top-nav a,
-body.dark-mode a { color: #bfc8ff; }
+body.dark-mode a { color: var(--primary); }
 
-body.dark-mode a:visited, body.dark-mode .top-nav a:visited { color: #94b6ff; }
+body.dark-mode a:visited, body.dark-mode .top-nav a:visited { color: var(--primary); }
 
 
 .top-nav {
@@ -248,8 +248,8 @@ body.dark-mode .textarea {
 .btn-success { background: #2ea44f; color: #fff; border: none; }
 .btn-success:hover { background: #23863a; }
 
-.btn-link { background: transparent; color: #214b9a; border: none; padding: 0; text-decoration: underline; }
-body.dark-mode .btn-link { color: #9fc1ff; }
+.btn-link { background: transparent; color: var(--primary); border: none; padding: 0; text-decoration: underline; }
+body.dark-mode .btn-link { color: var(--primary); }
 
 /* Variante de botão pequeno usada nos templates */
 .btn-sm { padding: 6px 10px; font-size: 14px; border-radius: 6px; }
@@ -319,9 +319,9 @@ body.dark-mode .board-card {
   color: #e8eef6;
 }
 body.dark-mode .board-card h2 { color: #eef6ff; }
-body.dark-mode .btn-primary { background: #2f56f6; box-shadow: 0 6px 18px rgba(47,86,246,0.14); color: #fff; }
-body.dark-mode .btn-primary:hover { box-shadow: 0 10px 30px rgba(47,86,246,0.22); }
-body.dark-mode .btn-secondary { color: #bcd9ff; border-color: rgba(140,160,200,0.06); }
+body.dark-mode .btn-primary { background: var(--primary); box-shadow: 0 6px 18px rgba(108,92,231,0.14); color: #fff; }
+body.dark-mode .btn-primary:hover { box-shadow: 0 10px 30px rgba(108,92,231,0.22); }
+body.dark-mode .btn-secondary { color: var(--primary); border-color: rgba(108,92,231,0.06); }
 body.dark-mode .btn-secondary:hover { background: rgba(255,255,255,0.03); }
 
 .btn-secondary {
