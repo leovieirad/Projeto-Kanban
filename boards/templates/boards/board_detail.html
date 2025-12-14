@@ -60,12 +60,15 @@
                             </form>
                         </div>
 
-                        <div id="card-form-{{ card.id }}" style="display:none; margin-top:8px;">
-                            <form method="POST" action="{% url 'boards:edit_card' card.id %}">
+                        <div id="card-form-{{ card.id }}" style="display:none; margin-top:12px; padding:12px; background: rgba(0,0,0,0.1); border-radius:8px;">
+                            <form method="POST" action="{% url 'boards:edit_card' card.id %}" style="display: flex; flex-direction: column; gap: 10px;">
                                 {% csrf_token %}
-                                <input type="text" name="title" value="{{ card.title }}" class="form-control mb-2">
-                                <textarea name="description" class="form-control mb-2">{{ card.description }}</textarea>
-                                <button type="submit" class="btn btn-success btn-sm">Salvar</button>
+                                <input type="text" name="title" value="{{ card.title }}" class="form-control" placeholder="Título" style="padding: 8px; border-radius: 6px;">
+                                <textarea name="description" class="form-control" placeholder="Descrição" style="padding: 8px; border-radius: 6px; min-height: 60px; resize: vertical;">{{ card.description }}</textarea>
+                                <div style="display: flex; gap: 8px; justify-content: flex-end;">
+                                    <button type="button" class="btn btn-sm" onclick="toggleCardForm({{ card.id }})" style="background: transparent; color: var(--muted); border: 1px solid #ccc;">Cancelar</button>
+                                    <button type="submit" class="btn btn-success btn-sm">Salvar</button>
+                                </div>
                             </form>
                         </div>
                     </div>
@@ -77,12 +80,15 @@
 
             {% if c.column %}
                 <button class="btn btn-primary full-width" onclick="toggleNewCardForm({{ c.column.id }})">+ Adicionar cartão</button>
-                <div id="new-card-{{ c.column.id }}" style="display:none; margin-top:8px;">
-                    <form method="POST" action="{% url 'boards:create_card' c.column.id %}">
+                <div id="new-card-{{ c.column.id }}" style="display:none; margin-top:8px; padding:12px; background: rgba(0,0,0,0.1); border-radius:8px;">
+                    <form method="POST" action="{% url 'boards:create_card' c.column.id }}" style="display: flex; flex-direction: column; gap: 10px;">
                         {% csrf_token %}
-                        <input type="text" name="title" class="form-control mb-2" placeholder="Título do cartão">
-                        <textarea name="description" class="form-control mb-2" placeholder="Descrição"></textarea>
-                        <button type="submit" class="btn btn-success btn-sm">Criar</button>
+                        <input type="text" name="title" class="form-control" placeholder="Título do cartão" style="padding: 8px; border-radius: 6px;">
+                        <textarea name="description" class="form-control" placeholder="Descrição (opcional)" style="padding: 8px; border-radius: 6px; min-height: 60px; resize: vertical;"></textarea>
+                        <div style="display: flex; gap: 8px; justify-content: flex-end;">
+                            <button type="button" class="btn btn-sm" onclick="toggleNewCardForm({{ c.column.id }})" style="background: transparent; color: var(--muted); border: 1px solid #ccc;">Cancelar</button>
+                            <button type="submit" class="btn btn-success btn-sm">Criar</button>
+                        </div>
                     </form>
                 </div>
             {% endif %}

@@ -1,4 +1,5 @@
 TODO:
 
 1- Corigir pesquisa ao digitar e cancelar busca
-3- Criar uma tela de cadastro e login
+2- Criar uma tela de cadastro e login
+
