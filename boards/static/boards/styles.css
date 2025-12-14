@@ -123,6 +123,31 @@ body.dark-mode .top-nav {
   background: #232529;
 }
 
+/* Logo do projeto */
+.brand-logo {
+  font-size: 24px;
+  font-weight: 800;
+  background: linear-gradient(135deg, #6C5CE7 0%, #a29bfe 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-decoration: none !important;
+  letter-spacing: -0.5px;
+  transition: transform 0.2s ease;
+}
+
+.brand-logo:hover {
+  transform: scale(1.05);
+  text-decoration: none !important;
+}
+
+body.dark-mode .brand-logo {
+  background: linear-gradient(135deg, #a29bfe 0%, #dfe6e9 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
 /* Links no topo e geral (evita roxo de visited) */
 .top-nav a,
 a { color: var(--primary); text-decoration: none; }

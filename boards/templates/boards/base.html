@@ -4,13 +4,15 @@
   {% load static %}
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Kanban</title>
+  <title>Boardly</title>
   <link rel="stylesheet" href="{% static 'boards/styles.css' %}">
 </head>
 
 <body>
 
 <header class="top-nav">
+
+  <a href="{% url 'boards:list' %}" class="brand-logo">Boardly</a>
 
   <nav>
     <a href="{% url 'boards:list' %}">Quadros</a>
