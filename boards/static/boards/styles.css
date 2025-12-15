@@ -273,6 +273,14 @@ body.dark-mode .btn-link { color: var(--primary); }
   min-width: 220px;
   background: #fff;
 }
+
+.highlight {
+  background-color: rgba(108, 92, 231, 0.25);
+  color: inherit;
+  padding: 0 2px;
+  border-radius: 4px;
+}
+
 body.dark-mode .search-input { background: #2b2d31; border: 1px solid #444; color: #fff; }
 
 .boards-grid {
