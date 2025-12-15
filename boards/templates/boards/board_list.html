@@ -5,8 +5,8 @@
     <div class="header">
             <div style="display:flex;align-items:center;gap:16px;flex:1;">
                 <h1 class="page-title">Meus Quadros</h1>
-                <form method="get" class="board-search" style="margin-left:8px;">
-                    <input name="q" type="search" class="search-input" placeholder="Procurar quadros..." value="{{ request.GET.q }}">
+                <form class="board-search" style="margin-left:8px;">
+                    <input name="q" type="search" class="search-input" placeholder="Procurar quadros..." >
                 </form>
             </div>
             <a href="{% url 'boards:create_board' %}" class="btn-primary btn-new">+ Novo quadro</a>
@@ -43,67 +43,47 @@
             {% endif %}
     {% endif %}
 </div>
-{% endblock %}
 
 <script>
-document.addEventListener('DOMContentLoaded', function () {
-    const input = document.querySelector('.search-input');
-    if (!input) return;
+document.addEventListener('DOMContentLoaded', () => {
+  const input = document.querySelector('.search-input');
+  const cards = document.querySelectorAll('.board-card');
 
-    const DEBOUNCE_MS = 250;
-    let timer = null;
+  if (!input || !cards.length) return;
 
-    function buildUrl(q) {
-        const base = window.location.pathname;
-        if (!q) return base;
-        return base + '?q=' + encodeURIComponent(q);
+  function normalize(text) {
+    return text.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+  }
+
+  function filterBoards(value) {
+    const search = normalize(value);
+
+    cards.forEach(card => {
+      const text = normalize(card.innerText);
+      card.style.display = text.includes(search) ? '' : 'none';
+    });
+  }
+
+  // Filtrar enquanto digita
+  input.addEventListener('input', () => {
+    filterBoards(input.value);
+  });
+
+  // ESC limpa
+  input.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      input.value = '';
+      filterBoards('');
     }
+  });
 
-    const form = input.closest('form');
-    function goToQuery(q) {
-        // Preferir submeter o formulário (GET) para manter comportamento consistente.
-        if (form) {
-            // se q estiver vazio, limpar o campo e submeter para a URL base
-            input.value = q || '';
-            try { form.submit(); return; } catch (e) { /* fallback to assign */ }
-        }
-        const url = buildUrl(q);
-        window.location.assign(url);
+  // Botão X do input type="search"
+  input.addEventListener('search', () => {
+    if (!input.value) {
+      filterBoards('');
     }
-
-    let prevVal = input.value || '';
-    input.addEventListener('input', function () {
-        const cur = input.value || '';
-        // Se ficou vazio (usuário clicou no X ou limpou), navegar imediatamente para a URL base
-        if (prevVal.length > 0 && cur.length === 0) {
-            goToQuery('');
-            prevVal = cur;
-            return;
-        }
-
-        clearTimeout(timer);
-        timer = setTimeout(() => {
-            const v = cur.trim();
-            // Navegar apenas se o valor não estiver vazio
-            goToQuery(v);
-        }, DEBOUNCE_MS);
-
-        prevVal = cur;
-    });
-
-    // Alguns navegadores disparam o evento 'search' quando o X nativo é usado — tratar explicitamente
-    input.addEventListener('search', function () {
-        if ((input.value || '').length === 0) {
-            goToQuery('');
-        }
-    });
-
-    // ESC para limpar imediatamente
-    input.addEventListener('keydown', function (e) {
-        if (e.key === 'Escape') {
-            input.value = '';
-            goToQuery('');
-        }
-    });
+  });
 });
 </script>
+{% endblock %}
+
