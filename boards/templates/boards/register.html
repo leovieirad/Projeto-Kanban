@@ -140,6 +140,44 @@
     .auth-footer a:hover {
       color: #764ba2;
     }
+
+    .password-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .password-wrapper input {
+      flex: 1;
+    }
+
+    .toggle-password {
+      position: absolute;
+      right: 12px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: #667eea;
+      font-size: 1.2rem;
+      padding: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 30px;
+      height: 30px;
+      opacity: 0;
+      transition: opacity 0.2s, color 0.2s;
+      pointer-events: none;
+    }
+
+    .password-wrapper:focus-within.has-text .toggle-password {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .toggle-password:hover {
+      color: #764ba2;
+    }
   </style>
 </head>
 <body>
@@ -180,12 +218,18 @@
 
     <div class="form-group">
       <label for="password">Senha</label>
-      <input type="password" id="password" name="password" required>
+      <div class="password-wrapper">
+        <input type="password" id="password" name="password" required>
+        <button type="button" class="toggle-password" onclick="togglePassword('password')">👁️</button>
+      </div>
     </div>
 
     <div class="form-group">
       <label for="password_confirm">Confirmar Senha</label>
-      <input type="password" id="password_confirm" name="password_confirm" required>
+      <div class="password-wrapper">
+        <input type="password" id="password_confirm" name="password_confirm" required>
+        <button type="button" class="toggle-password" onclick="togglePassword('password_confirm')">👁️</button>
+      </div>
     </div>
 
     <button type="submit" class="btn-submit">Criar Conta</button>
@@ -196,5 +240,40 @@
   </div>
 </div>
 
-</body>
-</html>
+<script>
+  function togglePassword(fieldId) {
+    const field = document.getElementById(fieldId);
+    const button = event.target.closest('.toggle-password');
+    
+    if (field.type === 'password') {
+      field.type = 'text';
+      button.textContent = '🙈';
+    } else {
+      field.type = 'password';
+      button.textContent = '👁️';
+    }
+  }
+
+  // Controlar visibilidade do botão baseado no conteúdo
+  document.addEventListener('DOMContentLoaded', function() {
+    const passwordFields = document.querySelectorAll('.password-wrapper input');
+    
+    passwordFields.forEach(field => {
+      const wrapper = field.closest('.password-wrapper');
+      
+      function updateVisibility() {
+        if (field.value.length > 0) {
+          wrapper.classList.add('has-text');
+        } else {
+          wrapper.classList.remove('has-text');
+        }
+      }
+      
+      field.addEventListener('input', updateVisibility);
+      field.addEventListener('focus', updateVisibility);
+      field.addEventListener('blur', updateVisibility);
+      updateVisibility();
+    });
+  });
+</script>
+
