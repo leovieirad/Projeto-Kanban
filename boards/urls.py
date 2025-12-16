@@ -8,11 +8,20 @@ from .views import (
     create_card,
     update_board,
     toggle_card_done,
+    login_view,
+    register_view,
+    logout_view,
 )
 
 app_name = "boards"
 
 urlpatterns = [
+    # Autenticação
+    path("login/", login_view, name="login"),
+    path("register/", register_view, name="register"),
+    path("logout/", logout_view, name="logout"),
+    
+    # Quadros
     path("", BoardListView.as_view(), name="list"),
     path("boards/novo/", create_board, name="create_board"),
     path("boards/<int:pk>/", BoardDetailView.as_view(), name="detail"),

@@ -2,6 +2,9 @@ from django.http import JsonResponse
 from django.views.decorators.http import require_POST
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.models import User
+from django.contrib.auth.decorators import login_required
 from django.views.generic import ListView, DetailView
 from django.db.models import Q
 from .models import Board, Column, Card
@@ -14,6 +17,11 @@ class BoardListView(ListView):
     template_name = "boards/board_list.html"
     context_object_name = "boards"
     
+    def dispatch(self, request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            return redirect("boards:login")
+        return super().dispatch(request, *args, **kwargs)
+    
     def get_queryset(self):
         qs = super().get_queryset()
         q = self.request.GET.get('q', '').strip()
@@ -25,6 +33,11 @@ class BoardDetailView(DetailView):
     model = Board
     template_name = "boards/board_detail.html"
     context_object_name = "board"
+    
+    def dispatch(self, request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            return redirect("boards:login")
+        return super().dispatch(request, *args, **kwargs)
     
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
@@ -74,6 +87,10 @@ class BoardDetailView(DetailView):
         return ctx
 
 def create_board(request):
+    """Cria um novo quadro."""
+    if not request.user.is_authenticated:
+        return redirect("boards:login")
+    
     if request.method == "POST":
         title = request.POST.get("title", "").strip()
         description = request.POST.get("description", "").strip()
@@ -88,6 +105,10 @@ def create_board(request):
     return render(request, "boards/board_form.html")
 
 def create_column(request, board_pk):
+    """Cria uma nova coluna em um quadro."""
+    if not request.user.is_authenticated:
+        return redirect("boards:login")
+    
     board = get_object_or_404(Board, pk=board_pk)
     if request.method == "POST":
         title = request.POST.get("title", "").strip()
@@ -101,6 +122,10 @@ def create_column(request, board_pk):
     return redirect("boards:detail", pk=board.pk)
 
 def update_board(request, pk):
+    """Atualiza informações de um quadro."""
+    if not request.user.is_authenticated:
+        return redirect("boards:login")
+    
     board = get_object_or_404(Board, pk=pk)
     if request.method == "POST":
         board.title = request.POST.get("title")
@@ -113,12 +138,20 @@ def update_board(request, pk):
 
 @require_POST
 def toggle_card_done(request, card_pk):
+    """Marca um cartão como feito ou não."""
+    if not request.user.is_authenticated:
+        return redirect("boards:login")
+    
     card = get_object_or_404(Card, pk=card_pk)
     card.is_done = not card.is_done
     card.save()
     return JsonResponse({"is_done": card.is_done})
 
 def edit_card(request, card_id):
+    """Edita um cartão."""
+    if not request.user.is_authenticated:
+        return redirect("boards:login")
+    
     card = get_object_or_404(Card, id=card_id)
     if request.method == "POST":
         card.title = request.POST.get("title")
@@ -129,6 +162,10 @@ def edit_card(request, card_id):
 
 
 def create_card(request, column_id):
+    """Cria um novo cartão em uma coluna."""
+    if not request.user.is_authenticated:
+        return redirect("boards:login")
+    
     column = get_object_or_404(Column, id=column_id)
     if request.method == "POST":
         Card.objects.create(
@@ -143,6 +180,9 @@ def create_card(request, column_id):
 @require_POST
 def delete_card(request, card_pk):
     """Exclui um cartão e redireciona para o quadro pai."""
+    if not request.user.is_authenticated:
+        return redirect("boards:login")
+    
     card = get_object_or_404(Card, pk=card_pk)
     board_id = card.column.board.id
     card.delete()
@@ -153,6 +193,9 @@ def delete_card(request, card_pk):
 @require_POST
 def delete_board(request, pk):
     """Exclui um quadro e redireciona para a lista de quadros."""
+    if not request.user.is_authenticated:
+        return redirect("boards:login")
+    
     board = get_object_or_404(Board, pk=pk)
     board.delete()
     messages.success(request, "Quadro excluído.")
@@ -166,6 +209,9 @@ def reorder_cards(request):
     Formato esperado (JSON):
     {"columns": [{"id": 1, "cards": [3,5,2]}, {"id":2, "cards": [4,1]}]}
     """
+    if not request.user.is_authenticated:
+        return JsonResponse({"ok": False, "error": "unauthorized"}, status=401)
+    
     try:
         payload = json.loads(request.body.decode("utf-8"))
     except Exception:
@@ -192,4 +238,80 @@ def reorder_cards(request):
                     continue
 
     return JsonResponse({"ok": True})
+
+
+# ============== VIEWS DE AUTENTICAÇÃO ==============
+
+def login_view(request):
+    """View para login de usuários."""
+    if request.user.is_authenticated:
+        return redirect("boards:list")
+    
+    if request.method == "POST":
+        username = request.POST.get("username")
+        password = request.POST.get("password")
+        user = authenticate(request, username=username, password=password)
+        
+        if user is not None:
+            login(request, user)
+            messages.success(request, f"Bem-vindo, {user.first_name or user.username}!")
+            return redirect("boards:list")
+        else:
+            messages.error(request, "Usuário ou senha inválidos.")
+    
+    return render(request, "boards/login.html")
+
+
+def register_view(request):
+    """View para cadastro de novos usuários."""
+    if request.user.is_authenticated:
+        return redirect("boards:list")
+    
+    if request.method == "POST":
+        username = request.POST.get("username", "").strip()
+        email = request.POST.get("email", "").strip()
+        first_name = request.POST.get("first_name", "").strip()
+        password = request.POST.get("password", "")
+        password_confirm = request.POST.get("password_confirm", "")
+        
+        # Validações
+        if not username or not email or not password:
+            messages.error(request, "Todos os campos são obrigatórios.")
+            return render(request, "boards/register.html")
+        
+        if len(password) < 6:
+            messages.error(request, "A senha deve ter no mínimo 6 caracteres.")
+            return render(request, "boards/register.html")
+        
+        if password != password_confirm:
+            messages.error(request, "As senhas não conferem.")
+            return render(request, "boards/register.html")
+        
+        if User.objects.filter(username=username).exists():
+            messages.error(request, "Este usuário já existe.")
+            return render(request, "boards/register.html")
+        
+        if User.objects.filter(email=email).exists():
+            messages.error(request, "Este email já está cadastrado.")
+            return render(request, "boards/register.html")
+        
+        # Criar usuário
+        user = User.objects.create_user(
+            username=username,
+            email=email,
+            first_name=first_name,
+            password=password
+        )
+        
+        messages.success(request, "Conta criada com sucesso! Faça login para continuar.")
+        return redirect("boards:login")
+    
+    return render(request, "boards/register.html")
+
+
+def logout_view(request):
+    """View para logout de usuários."""
+    logout(request)
+    messages.success(request, "Você saiu com sucesso.")
+    return redirect("boards:login")
 
