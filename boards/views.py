@@ -350,11 +350,11 @@ def change_password_view(request):
             update_session_auth_hash(request, user)  # mantém sessão ativa
             messages.success(request, "Senha alterada com sucesso.")
         else:
-            # Coletar mensagens de erro do formulário
+            # Coletar mensagens de erro do formulário (sem prefixo do nome do campo)
             errors = []
-            for field, field_errors in form.errors.items():
+            for _field, field_errors in form.errors.items():
                 for err in field_errors:
-                    errors.append(f"{field}: {err}")
+                    errors.append(str(err))
             if errors:
                 messages.error(request, "\n".join(errors))
             else:
