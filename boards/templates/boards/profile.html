@@ -23,16 +23,37 @@
       </div>
 
       <div style="display:flex; gap:10px; justify-content:flex-end; margin-top: 6px;">
-        <a href="{% url 'boards:list' %}" class="btn-secondary">Cancelar</a>
-        <button type="submit" class="btn-primary">Salvar</button>
+        <a href="{% url 'boards:list' %}" class="btn-secondary btn-sm btn-open">Cancelar</a>
+        <button type="submit" class="btn-primary btn-sm btn-open">Salvar</button>
       </div>
     </form>
 
     <hr style="margin: 18px 0;">
-    <div style="display:flex; gap:10px; align-items:center;">
+    <div style="display:flex; gap:10px; align-items:center; justify-content: space-between;">
       <span style="color: var(--muted);">Conectado como <strong>{{ user_obj.username }}</strong></span>
-      <a href="{% url 'boards:logout' %}" class="btn-danger" style="padding:8px 12px;">Sair</a>
+      <a href="{% url 'boards:logout' %}" class="btn-danger btn-sm btn-open">Sair</a>
     </div>
+
+    <hr style="margin: 18px 0;">
+    <h2 class="page-title" style="font-size:20px;">Alterar senha</h2>
+    <form method="POST" action="{% url 'boards:change_password' %}" style="display:flex; flex-direction: column; gap: 12px;">
+      {% csrf_token %}
+      <div>
+        <label for="id_old_password">Senha atual</label>
+        <input id="id_old_password" name="old_password" class="input" type="password" placeholder="Digite sua senha atual">
+      </div>
+      <div>
+        <label for="id_new_password1">Nova senha</label>
+        <input id="id_new_password1" name="new_password1" class="input" type="password" placeholder="Nova senha">
+      </div>
+      <div>
+        <label for="id_new_password2">Confirmar nova senha</label>
+        <input id="id_new_password2" name="new_password2" class="input" type="password" placeholder="Repita a nova senha">
+      </div>
+      <div style="display:flex; gap:10px; justify-content:flex-end;">
+        <button type="submit" class="btn-primary btn-sm btn-open">Alterar senha</button>
+      </div>
+    </form>
   </div>
 </div>
 {% endblock %}

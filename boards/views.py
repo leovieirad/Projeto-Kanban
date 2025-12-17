@@ -3,6 +3,8 @@ from django.views.decorators.http import require_POST
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.forms import PasswordChangeForm
+from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.views.generic import ListView, DetailView
@@ -336,4 +338,28 @@ def profile_view(request):
         return redirect("boards:profile")
 
     return render(request, "boards/profile.html", {"user_obj": user})
+
+
+@login_required
+def change_password_view(request):
+    """Altera a senha do usuário autenticado usando PasswordChangeForm."""
+    if request.method == "POST":
+        form = PasswordChangeForm(request.user, request.POST)
+        if form.is_valid():
+            user = form.save()
+            update_session_auth_hash(request, user)  # mantém sessão ativa
+            messages.success(request, "Senha alterada com sucesso.")
+        else:
+            # Coletar mensagens de erro do formulário
+            errors = []
+            for field, field_errors in form.errors.items():
+                for err in field_errors:
+                    errors.append(f"{field}: {err}")
+            if errors:
+                messages.error(request, "\n".join(errors))
+            else:
+                messages.error(request, "Não foi possível alterar a senha.")
+        return redirect("boards:profile")
+    # Em GET apenas redireciona para o perfil
+    return redirect("boards:profile")
 
