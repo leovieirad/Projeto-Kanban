@@ -11,6 +11,7 @@ from .views import (
     login_view,
     register_view,
     logout_view,
+    profile_view,
 )
 
 app_name = "boards"
@@ -20,6 +21,7 @@ urlpatterns = [
     path("login/", login_view, name="login"),
     path("register/", register_view, name="register"),
     path("logout/", logout_view, name="logout"),
+    path("profile/", profile_view, name="profile"),
     
     # Quadros
     path("", BoardListView.as_view(), name="list"),

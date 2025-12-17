@@ -315,3 +315,25 @@ def logout_view(request):
     messages.success(request, "Você saiu com sucesso.")
     return redirect("boards:login")
 
+
+@login_required
+def profile_view(request):
+    """Tela de perfil para editar informações básicas do usuário atual."""
+    user = request.user
+
+    if request.method == "POST":
+        first_name = request.POST.get("first_name", "").strip()
+        last_name = request.POST.get("last_name", "").strip()
+        email = request.POST.get("email", "").strip()
+
+        # Atualiza somente campos permitidos
+        user.first_name = first_name
+        user.last_name = last_name
+        user.email = email
+        user.save()
+
+        messages.success(request, "Perfil atualizado com sucesso.")
+        return redirect("boards:profile")
+
+    return render(request, "boards/profile.html", {"user_obj": user})
+
