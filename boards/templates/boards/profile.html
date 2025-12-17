@@ -22,7 +22,7 @@
         <input id="id_email" name="email" class="input" type="email" value="{{ user_obj.email }}" placeholder="seu@email.com">
       </div>
 
-      <div style="display:flex; gap:10px; justify-content:flex-end; margin-top: 6px;">
+      <div style="display:flex; gap:10px; justify-content:flex-end; align-items:center; margin-top: 6px;">
         <a href="{% url 'boards:list' %}" class="btn-secondary btn-sm btn-open btn-equal">Cancelar</a>
         <button type="submit" class="btn-primary btn-sm btn-open btn-equal">Salvar</button>
       </div>
@@ -50,7 +50,7 @@
         <label for="id_new_password2">Confirmar nova senha</label>
         <input id="id_new_password2" name="new_password2" class="input" type="password" placeholder="Repita a nova senha">
       </div>
-      <div style="display:flex; gap:10px; justify-content:flex-end;">
+      <div style="display:flex; gap:10px; justify-content:flex-end; align-items:center;">
         <button type="submit" class="btn-primary btn-sm btn-open btn-equal">Alterar senha</button>
       </div>
     </form>

@@ -340,7 +340,10 @@ body.dark-mode .btn-secondary:hover { background: rgba(255,255,255,0.03); }
   border-radius: 8px;
   text-decoration: none;
   display: inline-block;
+  font-weight: 600;
+  margin-top: -1px;
 }
+
 .btn-secondary:hover { text-decoration: none !important; }
 .btn-new { padding: 12px 18px; font-size: 16px; background: var(--primary-strong); color: #fff !important; box-shadow: 0 8px 26px rgba(92,68,199,0.12); border-radius: 12px; border: none; display: inline-flex; align-items: center; justify-content: center; }
 .btn-new:hover { transform: translateY(-2px); }
@@ -662,12 +665,18 @@ body.dark-mode .col-feito .btn-primary.full-width { box-shadow: 0 8px 22px rgba(
 .btn-secondary.btn-open,
 .btn-danger.btn-open,
 button.btn-open {
-  padding: 8px 14px !important;
+  padding: 0 14px !important; /* remove padding vertical para altura idêntica */
   display: inline-flex !important;
   align-items: center !important;
   justify-content: center !important;
   min-height: 40px !important;
+  height: 40px !important; /* força mesma altura visual */
+  line-height: 40px !important; /* centraliza texto por linha, compatível com navegadores */
+  font-size: 15px !important; /* padroniza tamanho da fonte */
+  border-radius: 10px !important; /* padroniza cantos */
   box-sizing: border-box !important;
+  appearance: none !important;
+  -webkit-appearance: none !important; /* evita diferenças nativas (Opera/Chromium) */
 }
 
 /* Utilitário: garantir largura/tamanho idênticos quando necessário */
