@@ -1345,4 +1345,40 @@ body.dark-mode .card-modal-edit-form .btn-cancel:hover {
     background: rgba(255, 255, 255, 0.08);
 }
 
+/* Variações de cor do botão de salvar por coluna */
+.card-modal-edit-form .btn-save.save-afazer {
+    background: linear-gradient(135deg, #1E90FF, #4682FF);
+    box-shadow: 0 4px 12px rgba(70, 130, 255, 0.2);
+}
+
+.card-modal-edit-form .btn-save.save-afazer:hover {
+    background: linear-gradient(135deg, #1878e8, #3968e8);
+    box-shadow: 0 6px 16px rgba(70, 130, 255, 0.3);
+    transform: translateY(-1px);
+}
+
+.card-modal-edit-form .btn-save.save-progress {
+    background: linear-gradient(135deg, #FFC107, #FFB300);
+    color: #222;
+    box-shadow: 0 4px 12px rgba(255, 193, 7, 0.2);
+}
+
+.card-modal-edit-form .btn-save.save-progress:hover {
+    background: linear-gradient(135deg, #ffb300, #ff9c00);
+    box-shadow: 0 6px 16px rgba(255, 193, 7, 0.3);
+    color: #222;
+    transform: translateY(-1px);
+}
+
+.card-modal-edit-form .btn-save.save-feito {
+    background: linear-gradient(135deg, #34D399, #10B981);
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
+}
+
+.card-modal-edit-form .btn-save.save-feito:hover {
+    background: linear-gradient(135deg, #10b981, #059669);
+    box-shadow: 0 6px 16px rgba(16, 185, 129, 0.3);
+    transform: translateY(-1px);
+}
+
 

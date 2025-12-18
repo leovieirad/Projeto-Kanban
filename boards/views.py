@@ -189,6 +189,11 @@ def delete_card(request, card_pk):
     board_id = card.column.board.id
     card.delete()
     messages.success(request, "Cartão excluído.")
+    
+    # Se for AJAX, retorna JSON
+    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+        return JsonResponse({"ok": True, "board_id": board_id})
+    
     return redirect("boards:detail", pk=board_id)
 
 
