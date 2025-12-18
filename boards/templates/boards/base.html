@@ -14,12 +14,11 @@
 
   <a href="{% url 'boards:list' %}" class="brand-logo">Boardly</a>
 
-  <nav>
-    <a href="{% url 'boards:list' %}">Quadros</a>
+  <nav style="display: flex; align-items: center; gap: 12px;">
+    <a href="{% url 'boards:list' %}" style="color: var(--primary); text-decoration: none; font-weight: 500;">Quadros</a>
     {% if user.is_authenticated %}
-      <span style="margin: 0 0.5rem; color: #666;">|</span>
-      <a href="{% url 'boards:profile' %}" style="color: var(--primary); font-size: 0.9rem; text-decoration: none;">👤 {{ user.first_name|default:user.username }}</a>
-      <a href="{% url 'boards:logout' %}" style="color: #e74c3c;">Sair</a>
+      <span style="color: #999;">|</span>
+      <a href="{% url 'boards:profile' %}" style="color: var(--primary); text-decoration: none; font-weight: 500;">Perfil</a>
     {% endif %}
   </nav>
 

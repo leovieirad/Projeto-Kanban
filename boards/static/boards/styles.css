@@ -148,6 +148,32 @@ body.dark-mode .brand-logo {
   background-clip: text;
 }
 
+/* Botão de logout na navegação */
+.nav-logout-btn {
+  color: #ff4757;
+  text-decoration: none;
+  font-weight: 600;
+  padding: 6px 12px;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+}
+
+.nav-logout-btn:hover {
+  background: rgba(255, 71, 87, 0.12);
+  color: #ff3838;
+}
+
+body.dark-mode .nav-logout-btn {
+  color: #ff6b6b;
+}
+
+body.dark-mode .nav-logout-btn:hover {
+  background: rgba(255, 107, 107, 0.15);
+  color: #ff8787;
+}
+
 /* Links no topo e geral (evita roxo de visited) */
 .top-nav a,
 a { color: var(--primary); text-decoration: none; }
