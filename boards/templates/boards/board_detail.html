@@ -28,15 +28,15 @@
                 {{ board_form.as_p }}
             {% else %}
                 <div class="mb-2">
-                    <label for="id_title" class="form-label">Título</label>
-                    <input type="text" name="title" id="id_title" class="form-control" value="{{ board.title }}">
+                    <label for="id_title" class="form-label">📌 Título do Quadro</label>
+                    <input type="text" name="title" id="id_title" class="form-control" value="{{ board.title }}" placeholder="Digite o título do quadro" required>
                 </div>
                 <div class="mb-2">
-                    <label for="id_description" class="form-label">Descrição</label>
-                    <textarea name="description" id="id_description" class="form-control">{{ board.description }}</textarea>
+                    <label for="id_description" class="form-label">📝 Descrição</label>
+                    <textarea name="description" id="id_description" class="form-control" placeholder="Descreva o propósito deste quadro...">{{ board.description }}</textarea>
                 </div>
             {% endif %}
-            <button type="submit" class="btn btn-success">Salvar alterações</button>
+            <button type="submit" class="btn btn-success">💾 Salvar alterações</button>
         </form>
         <hr>
     </div>
@@ -49,28 +49,11 @@
             <div class="kanban-list" data-column-key="{{ c.key }}">
                 {% if c.cards %}
                     {% for card in c.cards %}
-                    <div class="kanban-card" draggable="true" data-card-id="{{ card.id }}">
+                    <div class="kanban-card" draggable="true" data-card-id="{{ card.id }}" onclick="openCardModal({{ card.id }}, '{{ card.title|escapejs }}', '{{ card.description|escapejs }}', {{ card.column.board.id }})" style="cursor: pointer;">
                         <div class="card-title"><strong>{{ card.title }}</strong></div>
-                        <div class="card-desc">{{ card.description }}</div>
-                        <div class="card-actions" style="display:flex;gap:8px;margin-top:8px;">
-                            <button class="btn btn-sm btn-link" onclick="toggleCardForm({{ card.id }})">Editar</button>
-                            <form method="post" action="{% url 'boards:delete_card' card.id %}" onsubmit="return confirm('Excluir cartão?');" style="margin:0;">
-                                {% csrf_token %}
-                                <button type="submit" class="btn btn-sm btn-danger">Excluir</button>
-                            </form>
-                        </div>
-
-                        <div id="card-form-{{ card.id }}" style="display:none; margin-top:12px; padding:12px; background: rgba(0,0,0,0.1); border-radius:8px;">
-                            <form method="POST" action="{% url 'boards:edit_card' card.id %}" style="display: flex; flex-direction: column; gap: 10px;">
-                                {% csrf_token %}
-                                <input type="text" name="title" value="{{ card.title }}" class="form-control" placeholder="Título" style="padding: 8px; border-radius: 6px;">
-                                <textarea name="description" class="form-control" placeholder="Descrição" style="padding: 8px; border-radius: 6px; min-height: 60px; resize: vertical;">{{ card.description }}</textarea>
-                                <div style="display: flex; gap: 8px; justify-content: flex-end;">
-                                    <button type="button" class="btn btn-sm" onclick="toggleCardForm({{ card.id }})" style="background: transparent; color: var(--muted); border: 1px solid #ccc;">Cancelar</button>
-                                    <button type="submit" class="btn btn-success btn-sm">Salvar</button>
-                                </div>
-                            </form>
-                        </div>
+                        {% if card.description %}
+                        <div class="card-desc">{{ card.description|truncatewords:15 }}</div>
+                        {% endif %}
                     </div>
                     {% endfor %}
                 {% else %}
@@ -98,7 +81,135 @@
 
 </div>
 
+<!-- Modal de Detalhes do Card (estilo Trello) -->
+<div class="card-modal-overlay" id="cardModal" onclick="closeCardModalOnOverlay(event)">
+    <div class="card-modal" onclick="event.stopPropagation()">
+        <div class="card-modal-header">
+            <span class="card-modal-icon">📋</span>
+            <h2 class="card-modal-title" id="modalCardTitle"></h2>
+            <button class="card-modal-close" onclick="closeCardModal()" type="button">
+                ✕
+            </button>
+        </div>
+        <div class="card-modal-body">
+            <div class="card-modal-section">
+                <div class="card-modal-section-title">
+                    <span>📝</span>
+                    Descrição
+                </div>
+                <div class="card-modal-description" id="modalCardDescription"></div>
+            </div>
+            
+            <div class="card-modal-section">
+                <div class="card-modal-section-title">
+                    <span>⚡</span>
+                    Ações
+                </div>
+                <div class="card-modal-actions">
+                    <button class="card-modal-btn" onclick="toggleEditForm()" type="button">
+                        ✏️ Editar
+                    </button>
+                    <button class="card-modal-btn danger" onclick="deleteCard()" type="button">
+                        🗑️ Excluir
+                    </button>
+                </div>
+                
+                <!-- Form de edição (escondido por padrão) -->
+                <div class="card-modal-edit-form" id="editForm">
+                    <form method="POST" id="cardEditForm" onsubmit="return submitCardEdit(event)">
+                        {% csrf_token %}
+                        <input type="text" name="title" id="editTitle" placeholder="Título do cartão" required>
+                        <textarea name="description" id="editDescription" placeholder="Descrição (opcional)"></textarea>
+                        <div class="btn-group">
+                            <button type="submit" class="btn-save">Salvar</button>
+                            <button type="button" class="btn-cancel" onclick="toggleEditForm()">Cancelar</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
+let currentCardId = null;
+let currentBoardId = null;
+
+function openCardModal(cardId, title, description, boardId) {
+    event.stopPropagation();
+    currentCardId = cardId;
+    currentBoardId = boardId;
+    
+    document.getElementById('modalCardTitle').textContent = title;
+    
+    const descElement = document.getElementById('modalCardDescription');
+    if (description && description.trim()) {
+        descElement.textContent = description;
+        descElement.classList.remove('empty');
+    } else {
+        descElement.textContent = 'Sem descrição';
+        descElement.classList.add('empty');
+    }
+    
+    // Preencher form de edição
+    document.getElementById('editTitle').value = title;
+    document.getElementById('editDescription').value = description;
+    document.getElementById('editForm').classList.remove('active');
+    
+    document.getElementById('cardModal').classList.add('active');
+    document.body.style.overflow = 'hidden';
+}
+
+function closeCardModal() {
+    document.getElementById('cardModal').classList.remove('active');
+    document.body.style.overflow = '';
+    currentCardId = null;
+    currentBoardId = null;
+}
+
+function closeCardModalOnOverlay(event) {
+    if (event.target.id === 'cardModal') {
+        closeCardModal();
+    }
+}
+
+function toggleEditForm() {
+    const form = document.getElementById('editForm');
+    form.classList.toggle('active');
+}
+
+function submitCardEdit(event) {
+    event.preventDefault();
+    const form = document.getElementById('cardEditForm');
+    form.action = `/card/${currentCardId}/edit/`;
+    form.submit();
+    return false;
+}
+
+function deleteCard() {
+    if (!confirm('Tem certeza que deseja excluir este cartão?')) return;
+    
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = `/cartoes/${currentCardId}/delete/`;
+    
+    const csrfInput = document.createElement('input');
+    csrfInput.type = 'hidden';
+    csrfInput.name = 'csrfmiddlewaretoken';
+    csrfInput.value = getCsrfToken();
+    form.appendChild(csrfInput);
+    
+    document.body.appendChild(form);
+    form.submit();
+}
+
+// Fechar modal com tecla ESC
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape' && document.getElementById('cardModal').classList.contains('active')) {
+        closeCardModal();
+    }
+});
+
 document.addEventListener('DOMContentLoaded', function () {
     const btnEdit = document.getElementById("btn-edit-board");
     const editForm = document.getElementById("edit-board-form");
@@ -114,12 +225,6 @@ document.addEventListener('DOMContentLoaded', function () {
             if (firstInput && editForm.style.display === "block") firstInput.focus();
         });
     }
-
-    window.toggleCardForm = function(id) {
-        let div = document.getElementById("card-form-" + id);
-        if (!div) return;
-        div.style.display = div.style.display === "none" || div.style.display === "" ? "block" : "none";
-    };
 
     window.toggleNewCardForm = function(id) {
         let div = document.getElementById("new-card-" + id);
