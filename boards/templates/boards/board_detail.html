@@ -81,7 +81,7 @@
             {% if c.column %}
                 <button class="btn btn-primary full-width" onclick="toggleNewCardForm({{ c.column.id }})">+ Adicionar cartão</button>
                 <div id="new-card-{{ c.column.id }}" style="display:none; margin-top:8px; padding:12px; background: rgba(0,0,0,0.1); border-radius:8px;">
-                    <form method="POST" action="{% url 'boards:create_card' c.column.id }}" style="display: flex; flex-direction: column; gap: 10px;">
+                    <form method="POST" action="{% url 'boards:create_card' c.column.id %}" style="display: flex; flex-direction: column; gap: 10px;">
                         {% csrf_token %}
                         <input type="text" name="title" class="form-control" placeholder="Título do cartão" style="padding: 8px; border-radius: 6px;">
                         <textarea name="description" class="form-control" placeholder="Descrição (opcional)" style="padding: 8px; border-radius: 6px; min-height: 60px; resize: vertical;"></textarea>
