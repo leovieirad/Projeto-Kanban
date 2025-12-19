@@ -170,12 +170,16 @@ def create_card(request, column_id):
     
     column = get_object_or_404(Column, id=column_id)
     if request.method == "POST":
-        Card.objects.create(
-            column=column,
-            title=request.POST.get("title"),
-            description=request.POST.get("description")
-        )
-        messages.success(request, "Cartão criado.")
+        title = request.POST.get("title", "").strip()
+        if not title:
+            messages.error(request, "O título do cartão é obrigatório.")
+        else:
+            Card.objects.create(
+                column=column,
+                title=title,
+                description=request.POST.get("description", "").strip()
+            )
+            messages.success(request, "Cartão criado.")
     return redirect("boards:detail", pk=column.board.id)
 
 
