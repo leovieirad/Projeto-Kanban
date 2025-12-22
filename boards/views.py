@@ -42,47 +42,46 @@ class BoardDetailView(DetailView):
         return super().dispatch(request, *args, **kwargs)
     
     def get_context_data(self, **kwargs):
+        """Renderiza TODAS as colunas do quadro.
+
+        - Mantém cores específicas para A Fazer / Em Progresso / Feito
+        - Para demais colunas, atribui uma classe de cor determinística com base no id
+        """
         ctx = super().get_context_data(**kwargs)
         board = self.get_object()
 
-        # Definir colunas padrão a exibir na ordem desejada.
-        desired = [
-            ("A Fazer", "afazer"),
-            ("Em Progresso", "progress"),
-            ("Feito", "feito"),
-        ]
-
-        def find_column_by_keywords(board, keywords):
-            qs = board.columns.all()
-            # procura exata
-            col = qs.filter(title__iexact=keywords).first()
-            if col:
-                return col
-            # procura por palavras-chave (icontains)
-            kws = [keywords]
-            # normalizar algumas variações
-            if keywords.lower().startswith('a') and 'fazer' in keywords.lower():
-                kws = ['fazer', 'a fazer', 'to do']
-            if 'progresso' in keywords.lower() or 'progress' in keywords.lower():
-                kws = ['progresso', 'fazendo', 'em progresso', 'doing', 'in progress']
-            if 'feito' in keywords.lower() or 'done' in keywords.lower():
-                kws = ['feito', 'concluido', 'concluído', 'done']
-
-            for k in kws:
-                col = qs.filter(title__icontains=k).first()
-                if col:
-                    return col
-            return None
+        def classify_column(col):
+            name = (col.title or "").lower()
+            # padrões conhecidos
+            if ('fazer' in name) or (name.strip() in ['to do', 'a fazer']):
+                return 'afazer', 'col-afazer'
+            if ('progresso' in name) or ('fazendo' in name) or ('doing' in name) or ('in progress' in name):
+                return 'progress', 'col-progress'
+            if ('feito' in name) or ('conclu' in name) or (name.strip() == 'done'):
+                return 'feito', 'col-feito'
+            # demais colunas: mapeia para paleta 1..8 de forma determinística
+            color_idx = (col.id % 8) + 1
+            return f'col-{col.id}', f'col-color-{color_idx}'
 
         kanban_columns = []
-        for display_name, key in desired:
-            col = find_column_by_keywords(board, display_name)
-            cards = col.cards.all() if col else []
+        for col in board.columns.all():
+            key, class_name = classify_column(col)
+            # Nome amigável padronizado para as colunas principais
+            if class_name == 'col-afazer':
+                display_name = 'A Fazer'
+            elif class_name == 'col-progress':
+                display_name = 'Em Progresso'
+            elif class_name == 'col-feito':
+                display_name = 'Feito'
+            else:
+                display_name = col.title
+
             kanban_columns.append({
                 'key': key,
+                'class_name': class_name,
                 'display_name': display_name,
                 'column': col,
-                'cards': cards,
+                'cards': col.cards.all(),
             })
 
         ctx['kanban_columns'] = kanban_columns
@@ -99,7 +98,7 @@ def create_board(request):
         if title:
             board = Board.objects.create(title=title, description=description)
             # Criar colunas padrão para padronizar novos quadros (A Fazer, Fazendo, Feito)
-            default_columns = ["A Fazer", "Fazendo", "Feito"]
+            default_columns = ["A Fazer", "Em Progresso", "Feito"]
             for idx, col_title in enumerate(default_columns):
                 Column.objects.create(board=board, title=col_title, position=idx)
             messages.success(request, "Quadro criado com sucesso.")

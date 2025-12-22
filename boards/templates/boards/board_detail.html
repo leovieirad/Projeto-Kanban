@@ -9,12 +9,11 @@
 
     <!-- As colunas são fixas: A Fazer / Em Progresso / Feito. A criação de novas colunas foi desabilitada. -->
 
-    <!-- Botão Editar Quadro -->
+    <!-- Ações do quadro -->
     <div style="display:flex;gap:10px;margin-bottom:12px;align-items:center;">
-        <button id="btn-edit-board" class="btn btn-primary">
-            Editar quadro
-        </button>
-        <form method="post" action="{% url 'boards:delete_board' board.id %}" onsubmit="return confirm('Deseja realmente excluir este quadro?');">
+        <button id="btn-edit-board" class="btn btn-primary">Editar quadro</button>
+        <button id="btn-add-new-column" class="btn btn-success">➕ Nova coluna</button>
+        <form method="post" action="{% url 'boards:delete_board' board.id %}" onsubmit="return confirm('Deseja realmente excluir este quadro?');" style="margin:0;">
             {% csrf_token %}
             <button type="submit" class="btn btn-danger btn-primary">Excluir quadro</button>
         </form>
@@ -41,10 +40,22 @@
         <hr>
     </div>
 
+    <!-- Formulário de Nova Coluna -->
+    <div id="new-column-form" style="display: none; margin-bottom: 20px; padding: 12px; background: rgba(0,0,0,0.1); border-radius: 8px;">
+        <form method="POST" action="{% url 'boards:create_column' board.id %}" style="display: flex; flex-direction: column; gap: 10px;">
+            {% csrf_token %}
+            <input type="text" name="title" class="form-control" placeholder="Nome da nova coluna" required style="padding: 8px; border-radius: 6px;">
+            <div style="display: flex; gap: 8px; justify-content: flex-end;">
+                <button type="button" class="btn btn-sm" onclick="toggleNewColumnForm()" style="background: transparent; color: var(--muted); border: 1px solid #ccc;">Cancelar</button>
+                <button type="submit" class="btn btn-success btn-sm">Criar coluna</button>
+            </div>
+        </form>
+    </div>
+
     <div class="board-columns">
         {% for c in kanban_columns %}
-        <div class="board-column col-{{ c.key }}" data-column-id="{% if c.column %}{{ c.column.id }}{% else %}0{% endif %}" data-column-key="{{ c.key }}">
-            <div class="col-header col-{{ c.key }}">{{ c.display_name }}</div>
+        <div class="board-column {{ c.class_name }}" data-column-id="{{ c.column.id }}" data-column-key="{{ c.key }}">
+            <div class="col-header {{ c.class_name }}">{{ c.display_name }}</div>
 
             <div class="kanban-list" data-column-key="{{ c.key }}">
                 {% if c.cards %}
@@ -61,20 +72,18 @@
                 {% endif %}
             </div>
 
-            {% if c.column %}
-                <button class="btn btn-primary full-width" onclick="toggleNewCardForm({{ c.column.id }})">+ Adicionar cartão</button>
-                <div id="new-card-{{ c.column.id }}" style="display:none; margin-top:8px; padding:12px; background: rgba(0,0,0,0.1); border-radius:8px;">
-                    <form method="POST" action="{% url 'boards:create_card' c.column.id %}" onsubmit="return validateCardTitle(this)" style="display: flex; flex-direction: column; gap: 10px;">
-                        {% csrf_token %}
-                        <input type="text" name="title" class="form-control" placeholder="Título do cartão" required style="padding: 8px; border-radius: 6px;">
-                        <textarea name="description" class="form-control" placeholder="Descrição (opcional)" style="padding: 8px; border-radius: 6px; min-height: 60px; resize: vertical;"></textarea>
-                        <div style="display: flex; gap: 8px; justify-content: flex-end;">
-                            <button type="button" class="btn btn-sm" onclick="toggleNewCardForm({{ c.column.id }})" style="background: transparent; color: var(--muted); border: 1px solid #ccc;">Cancelar</button>
-                            <button type="submit" class="btn btn-success btn-sm">Criar</button>
-                        </div>
-                    </form>
-                </div>
-            {% endif %}
+            <button class="btn btn-primary full-width" onclick="toggleNewCardForm({{ c.column.id }})">+ Adicionar cartão</button>
+            <div id="new-card-{{ c.column.id }}" style="display:none; margin-top:8px; padding:12px; background: rgba(0,0,0,0.1); border-radius:8px;">
+                <form method="POST" action="{% url 'boards:create_card' c.column.id %}" onsubmit="return validateCardTitle(this)" style="display: flex; flex-direction: column; gap: 10px;">
+                    {% csrf_token %}
+                    <input type="text" name="title" class="form-control" placeholder="Título do cartão" required style="padding: 8px; border-radius: 6px;">
+                    <textarea name="description" class="form-control" placeholder="Descrição (opcional)" style="padding: 8px; border-radius: 6px; min-height: 60px; resize: vertical;"></textarea>
+                    <div style="display: flex; gap: 8px; justify-content: flex-end;">
+                        <button type="button" class="btn btn-sm" onclick="toggleNewCardForm({{ c.column.id }})" style="background: transparent; color: var(--muted); border: 1px solid #ccc;">Cancelar</button>
+                        <button type="submit" class="btn btn-success btn-sm">Criar</button>
+                    </div>
+                </form>
+            </div>
         </div>
         {% endfor %}
     </div>
@@ -297,6 +306,26 @@ document.addEventListener('DOMContentLoaded', function () {
             if (firstInput && editForm.style.display === "block") firstInput.focus();
         });
     }
+
+    // Nova Coluna toggle
+    const btnAddColumn = document.getElementById("btn-add-new-column");
+    const newColumnForm = document.getElementById("new-column-form");
+    if (btnAddColumn && newColumnForm) {
+        btnAddColumn.addEventListener('click', function (e) {
+            e.preventDefault();
+            if (newColumnForm.style.display === "none" || newColumnForm.style.display === "") {
+                newColumnForm.style.display = "block";
+            } else {
+                newColumnForm.style.display = "none";
+            }
+            const firstInput = newColumnForm.querySelector('input');
+            if (firstInput && newColumnForm.style.display === "block") firstInput.focus();
+        });
+    }
+    window.toggleNewColumnForm = function() {
+        const form = document.getElementById("new-column-form");
+        form.style.display = form.style.display === "none" || form.style.display === "" ? "block" : "none";
+    };
 
     window.toggleNewCardForm = function(id) {
         let div = document.getElementById("new-card-" + id);

@@ -522,6 +522,12 @@ body.dark-mode .btn-new { color: #fff !important; background: var(--primary-stro
   .header { flex-direction: column; align-items: stretch; }
   .header .btn-primary { margin-left: 0; width: 100%; }
   .page { padding: 16px; }
+  /* Grid responsivo para colunas Kanban */
+  .board-columns { grid-template-columns: repeat(2, minmax(240px,1fr)); }
+}
+
+@media (max-width: 480px) {
+  .board-columns { grid-template-columns: 1fr; }
 }
 
 /* Mensagem de resultado vazio por busca */
@@ -541,14 +547,17 @@ body.dark-mode .btn-new { color: #fff !important; background: var(--primary-stro
 
 /* Layout Kanban */
 .board-columns {
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(280px, 1fr));
   gap: 24px;
   align-items: flex-start;
-  justify-content: center; /* centraliza as colunas na página */
   margin-top: 18px;
+  max-width: calc(4 * 320px + 3 * 24px);
+  margin-left: auto;
+  margin-right: auto;
 }
 
-.board-column { flex: 0 0 320px; max-width: 320px; }
+.board-column { width: 100%; min-width: 0; }
 
 .col-header {
   padding: 12px 14px;
@@ -561,6 +570,36 @@ body.dark-mode .btn-new { color: #fff !important; background: var(--primary-stro
 .col-afazer .col-header { background: linear-gradient(90deg, #1E90FF, #4682FF); }
 .col-progress .col-header { background: linear-gradient(90deg, #FFC107, #FFB300); color: #222; }
 .col-feito .col-header { background: linear-gradient(90deg, #34D399, #10B981); }
+
+/* Paleta de cores para colunas dinâmicas */
+.col-color-1 .col-header { background: linear-gradient(90deg, #8B5CF6, #A78BFA); }
+.col-color-2 .col-header { background: linear-gradient(90deg, #EC4899, #F472B6); }
+.col-color-3 .col-header { background: linear-gradient(90deg, #06B6D4, #22D3EE); }
+.col-color-4 .col-header { background: linear-gradient(90deg, #EF4444, #F87171); }
+.col-color-5 .col-header { background: linear-gradient(90deg, #3B82F6, #60A5FA); }
+.col-color-6 .col-header { background: linear-gradient(90deg, #F59E0B, #FBBF24); color:#222; }
+.col-color-7 .col-header { background: linear-gradient(90deg, #84CC16, #A3E635); }
+.col-color-8 .col-header { background: linear-gradient(90deg, #6366F1, #818CF8); }
+
+/* Maior especificidade para garantir aplicação da cor do cabeçalho em colunas dinâmicas */
+.board-column.col-color-1 .col-header { background: linear-gradient(90deg, #8B5CF6, #A78BFA); }
+.board-column.col-color-2 .col-header { background: linear-gradient(90deg, #EC4899, #F472B6); }
+.board-column.col-color-3 .col-header { background: linear-gradient(90deg, #06B6D4, #22D3EE); }
+.board-column.col-color-4 .col-header { background: linear-gradient(90deg, #EF4444, #F87171); }
+.board-column.col-color-5 .col-header { background: linear-gradient(90deg, #3B82F6, #60A5FA); }
+.board-column.col-color-6 .col-header { background: linear-gradient(90deg, #F59E0B, #FBBF24); color:#222; }
+.board-column.col-color-7 .col-header { background: linear-gradient(90deg, #84CC16, #A3E635); }
+.board-column.col-color-8 .col-header { background: linear-gradient(90deg, #6366F1, #818CF8); }
+
+/* Garantia extra caso o cabeçalho receba a classe diretamente */
+.col-header.col-color-1 { background: linear-gradient(90deg, #8B5CF6, #A78BFA); }
+.col-header.col-color-2 { background: linear-gradient(90deg, #EC4899, #F472B6); }
+.col-header.col-color-3 { background: linear-gradient(90deg, #06B6D4, #22D3EE); }
+.col-header.col-color-4 { background: linear-gradient(90deg, #EF4444, #F87171); }
+.col-header.col-color-5 { background: linear-gradient(90deg, #3B82F6, #60A5FA); }
+.col-header.col-color-6 { background: linear-gradient(90deg, #F59E0B, #FBBF24); color:#222; }
+.col-header.col-color-7 { background: linear-gradient(90deg, #84CC16, #A3E635); }
+.col-header.col-color-8 { background: linear-gradient(90deg, #6366F1, #818CF8); }
 
 .board-column .kanban-list { background: rgba(255,255,255,0.02); padding: 12px; border-radius: 8px; min-height: 220px; display:flex; flex-direction:column; gap:12px; }
 .board-column .kanban-card { background: #fff; color: #111; border-radius:10px; padding:14px 12px; box-shadow: 0 6px 18px rgba(16,24,40,0.06); position:relative; overflow:visible; }
@@ -598,6 +637,16 @@ body.dark-mode .board-column .kanban-card { background: #0f1113; color: #e8eef6;
   border-radius: 8px 8px 0 0;
   background: linear-gradient(90deg, #34D399, #10B981);
 }
+
+/* Faixa para colunas dinâmicas (primeira definição) */
+.col-color-1 .kanban-card::before { background: linear-gradient(90deg, #8B5CF6, #A78BFA); }
+.col-color-2 .kanban-card::before { background: linear-gradient(90deg, #EC4899, #F472B6); }
+.col-color-3 .kanban-card::before { background: linear-gradient(90deg, #06B6D4, #22D3EE); }
+.col-color-4 .kanban-card::before { background: linear-gradient(90deg, #EF4444, #F87171); }
+.col-color-5 .kanban-card::before { background: linear-gradient(90deg, #3B82F6, #60A5FA); }
+.col-color-6 .kanban-card::before { background: linear-gradient(90deg, #F59E0B, #FBBF24); }
+.col-color-7 .kanban-card::before { background: linear-gradient(90deg, #84CC16, #A3E635); }
+.col-color-8 .kanban-card::before { background: linear-gradient(90deg, #6366F1, #818CF8); }
 
 /* Ajuste interno para que o conteúdo do cartão não fique encoberto pelo ::before */
 .kanban-card .card-title { margin-top: 4px; }
@@ -727,6 +776,15 @@ body.dark-mode .floating-toast .toast-item.error { background: rgba(215,58,73,0.
 .col-afazer .kanban-card::before { background: linear-gradient(90deg, #1E90FF, #4682FF); }
 .col-progress .kanban-card::before { background: linear-gradient(90deg, #FFC107, #FFB300); }
 .col-feito .kanban-card::before   { background: linear-gradient(90deg, #34D399, #10B981); }
+/* Dinâmicas (reforça a faixa em toda a largura) */
+.col-color-1 .kanban-card::before { background: linear-gradient(90deg, #8B5CF6, #A78BFA); }
+.col-color-2 .kanban-card::before { background: linear-gradient(90deg, #EC4899, #F472B6); }
+.col-color-3 .kanban-card::before { background: linear-gradient(90deg, #06B6D4, #22D3EE); }
+.col-color-4 .kanban-card::before { background: linear-gradient(90deg, #EF4444, #F87171); }
+.col-color-5 .kanban-card::before { background: linear-gradient(90deg, #3B82F6, #60A5FA); }
+.col-color-6 .kanban-card::before { background: linear-gradient(90deg, #F59E0B, #FBBF24); }
+.col-color-7 .kanban-card::before { background: linear-gradient(90deg, #84CC16, #A3E635); }
+.col-color-8 .kanban-card::before { background: linear-gradient(90deg, #6366F1, #818CF8); }
 
 /* Criar espaço para a faixa para que o conteúdo do cartão não fique coberto */
 .board-column .kanban-card { padding-top: 18px; }
@@ -760,6 +818,25 @@ body.dark-mode .floating-toast .toast-item.error { background: rgba(215,58,73,0.
 body.dark-mode .col-afazer .btn-primary.full-width { box-shadow: 0 8px 22px rgba(30,144,255,0.08); }
 body.dark-mode .col-progress .btn-primary.full-width { box-shadow: 0 8px 22px rgba(255,193,7,0.06); }
 body.dark-mode .col-feito .btn-primary.full-width { box-shadow: 0 8px 22px rgba(34,197,94,0.08); }
+
+/* Botões '+ Adicionar cartão' para colunas dinâmicas */
+.col-color-1 .btn-primary.full-width { background: linear-gradient(90deg, #8B5CF6, #A78BFA); color:#fff; box-shadow: 0 8px 22px rgba(139,92,246,0.12); }
+.col-color-2 .btn-primary.full-width { background: linear-gradient(90deg, #EC4899, #F472B6); color:#fff; box-shadow: 0 8px 22px rgba(236,72,153,0.12); }
+.col-color-3 .btn-primary.full-width { background: linear-gradient(90deg, #06B6D4, #22D3EE); color:#003; box-shadow: 0 8px 22px rgba(6,182,212,0.12); }
+.col-color-4 .btn-primary.full-width { background: linear-gradient(90deg, #EF4444, #F87171); color:#fff; box-shadow: 0 8px 22px rgba(239,68,68,0.12); }
+.col-color-5 .btn-primary.full-width { background: linear-gradient(90deg, #3B82F6, #60A5FA); color:#fff; box-shadow: 0 8px 22px rgba(59,130,246,0.12); }
+.col-color-6 .btn-primary.full-width { background: linear-gradient(90deg, #F59E0B, #FBBF24); color:#111; box-shadow: 0 8px 22px rgba(245,158,11,0.12); }
+.col-color-7 .btn-primary.full-width { background: linear-gradient(90deg, #84CC16, #A3E635); color:#fff; box-shadow: 0 8px 22px rgba(132,204,22,0.12); }
+.col-color-8 .btn-primary.full-width { background: linear-gradient(90deg, #6366F1, #818CF8); color:#fff; box-shadow: 0 8px 22px rgba(99,102,241,0.12); }
+
+.col-color-1 .btn-primary.full-width:hover,
+.col-color-2 .btn-primary.full-width:hover,
+.col-color-3 .btn-primary.full-width:hover,
+.col-color-4 .btn-primary.full-width:hover,
+.col-color-5 .btn-primary.full-width:hover,
+.col-color-6 .btn-primary.full-width:hover,
+.col-color-7 .btn-primary.full-width:hover,
+.col-color-8 .btn-primary.full-width:hover { transform: translateY(-2px); }
 
 /* Garantir que botões de perigo possam compartilhar o tamanho do primário quando combinados */
 .btn-danger.btn-primary {
