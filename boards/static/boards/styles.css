@@ -1584,3 +1584,13 @@ body.dark-mode .board-column.drop-target-column {
     background: rgba(162, 155, 254, 0.05);
 }
 
+/* Estilos para o botão de deletar coluna */
+.btn-delete-column:hover {
+    background: rgba(255, 59, 48, 0.8) !important;
+    transform: scale(1.1);
+}
+
+.btn-delete-column:active {
+    transform: scale(0.95);
+}
+

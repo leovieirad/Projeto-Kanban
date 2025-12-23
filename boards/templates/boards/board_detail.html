@@ -55,7 +55,12 @@
     <div class="board-columns">
         {% for c in kanban_columns %}
         <div class="board-column {{ c.class_name }}" draggable="true" data-column-id="{{ c.column.id }}" data-column-key="{{ c.key }}">
-            <div class="col-header {{ c.class_name }}">{{ c.display_name }}</div>
+            <div class="col-header {{ c.class_name }}" style="display: flex; justify-content: space-between; align-items: center;">
+                <span>{{ c.display_name }}</span>
+                <button type="button" class="btn-delete-column" onclick="deleteColumn({{ c.column.id }})" title="Deletar coluna" style="background: rgba(255,255,255,0.2); border: none; color: #fff; cursor: pointer; font-size: 18px; padding: 4px 8px; border-radius: 4px; transition: 0.2s; hover: background: rgba(255,255,255,0.4);">
+                    ✕
+                </button>
+            </div>
 
             <div class="kanban-list" data-column-key="{{ c.key }}">
                 {% if c.cards %}
@@ -144,6 +149,42 @@
 let currentCardId = null;
 let currentBoardId = null;
 let currentColumnClass = null;
+
+// Função para obter CSRF Token (disponível globalmente)
+function getCsrfToken() {
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+    return getCookie('csrftoken');
+}
+
+// Notificação flutuante simples para feedback de requisições AJAX
+function showToast(message, type) {
+    try {
+        let container = document.querySelector('.floating-toast');
+        if (!container) {
+            container = document.createElement('div');
+            container.className = 'floating-toast';
+            document.body.appendChild(container);
+        }
+        const item = document.createElement('div');
+        item.className = 'toast-item ' + (type || '');
+        item.textContent = message;
+        container.appendChild(item);
+        setTimeout(() => { item.style.opacity = '0'; setTimeout(()=> item.remove(), 400); }, 2400);
+    } catch(e) { console.warn('toast fail', e); }
+}
 
 function openCardModal(cardId, title, description, boardId, columnClass) {
     event.stopPropagation();
@@ -259,20 +300,71 @@ function deleteCard() {
         if (response.ok) {
             return response.json().then(data => {
                 console.log('Delete response:', data);
+                
+                // Remover o cartão do DOM instantaneamente
+                const cardElement = document.querySelector(`[data-card-id="${currentCardId}"]`);
+                if (cardElement) {
+                    cardElement.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+                    cardElement.style.opacity = '0';
+                    cardElement.style.transform = 'scale(0.95)';
+                    setTimeout(() => {
+                        cardElement.remove();
+                    }, 300);
+                }
+                
+                // Mostrar notificação
+                showToast('Cartão excluído com sucesso', 'success');
+                
+                // Fechar o modal
                 closeCardModal();
-                setTimeout(() => {
-                    window.location.reload();
-                }, 300);
             });
         } else {
             return response.text().then(text => {
                 console.error('Error response:', text);
-                alert('Erro ao excluir cartão. Status: ' + response.status);
+                showToast('Erro ao excluir cartão. Status: ' + response.status, 'error');
             });
         }
     }).catch(error => {
         console.error('Erro ao excluir:', error);
-        alert('Erro ao excluir cartão: ' + error.message);
+        showToast('Erro ao excluir cartão: ' + error.message, 'error');
+    });
+}
+
+function deleteColumn(columnId) {
+    if (!confirm('Tem certeza que deseja excluir esta coluna? Todos os cartões serão deletados.')) return;
+    
+    const url = `/colunas/${columnId}/delete/`;
+    
+    fetch(url, {
+        method: 'POST',
+        credentials: 'same-origin',
+        headers: {
+            'X-CSRFToken': getCsrfToken(),
+            'X-Requested-With': 'XMLHttpRequest',
+            'Content-Type': 'application/json',
+        }
+    }).then(response => {
+        if (response.ok) {
+            return response.json().then(data => {
+                if (data.ok) {
+                    showToast('Coluna excluída com sucesso', 'success');
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 600);
+                } else {
+                    showToast(data.error || 'Erro ao excluir coluna', 'error');
+                }
+            });
+        } else {
+            return response.json().then(data => {
+                showToast(data.error || 'Erro ao excluir coluna', 'error');
+            }).catch(() => {
+                showToast('Erro ao excluir coluna', 'error');
+            });
+        }
+    }).catch(error => {
+        console.error('Erro:', error);
+        showToast('Erro ao excluir coluna: ' + error.message, 'error');
     });
 }
 
@@ -282,25 +374,6 @@ document.addEventListener('keydown', function(e) {
         closeCardModal();
     }
 });
-
-// Função para obter CSRF Token (disponível globalmente)
-function getCsrfToken() {
-    function getCookie(name) {
-        let cookieValue = null;
-        if (document.cookie && document.cookie !== '') {
-            const cookies = document.cookie.split(';');
-            for (let i = 0; i < cookies.length; i++) {
-                const cookie = cookies[i].trim();
-                if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                    break;
-                }
-            }
-        }
-        return cookieValue;
-    }
-    return getCookie('csrftoken');
-}
 
 document.addEventListener('DOMContentLoaded', function () {
     const btnEdit = document.getElementById("btn-edit-board");
@@ -535,23 +608,6 @@ document.addEventListener('DOMContentLoaded', function () {
               showToast('Erro de rede ao mover coluna', 'error');
               console.error(err);
           });
-    }
-
-    // Notificação flutuante simples para feedback de requisições AJAX
-    function showToast(message, type) {
-        try {
-            let container = document.querySelector('.floating-toast');
-            if (!container) {
-                container = document.createElement('div');
-                container.className = 'floating-toast';
-                document.body.appendChild(container);
-            }
-            const item = document.createElement('div');
-            item.className = 'toast-item ' + (type || '');
-            item.textContent = message;
-            container.appendChild(item);
-            setTimeout(() => { item.style.opacity = '0'; setTimeout(()=> item.remove(), 400); }, 2400);
-        } catch(e) { console.warn('toast fail', e); }
     }
 
     // Anexar eventos de arrastar/soltar após renderização inicial

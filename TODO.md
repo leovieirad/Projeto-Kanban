@@ -3,5 +3,3 @@
 ## 📋 Pendente
 
 Resposividade em outros dispositivos
-Apagar colunas
-

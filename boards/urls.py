@@ -39,6 +39,7 @@ urlpatterns = [
 
     path("card/<int:card_id>/edit/", views.edit_card, name="edit_card"),
     path("cartoes/<int:card_pk>/delete/", views.delete_card, name="delete_card"),
+    path("colunas/<int:column_pk>/delete/", views.delete_column, name="delete_column"),
     path("boards/<int:pk>/delete/", views.delete_board, name="delete_board"),
     path("api/cards/reorder/", views.reorder_cards, name="reorder_cards"),
     path("api/columns/reorder/", views.reorder_columns, name="reorder_columns"),

@@ -201,6 +201,29 @@ def delete_card(request, card_pk):
 
 
 @require_POST
+def delete_column(request, column_pk):
+    """Exclui uma coluna e retorna para o quadro pai."""
+    if not request.user.is_authenticated:
+        return JsonResponse({"ok": False, "error": "unauthorized"}, status=401)
+    
+    column = get_object_or_404(Column, pk=column_pk)
+    board_id = column.board.id
+    board = column.board
+    
+    # Verificar se há apenas uma coluna
+    if board.columns.count() <= 1:
+        return JsonResponse({"ok": False, "error": "Não é possível deletar a última coluna"}, status=400)
+    
+    column.delete()
+    
+    # Se for AJAX, retorna JSON
+    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+        return JsonResponse({"ok": True, "board_id": board_id})
+    
+    return redirect("boards:detail", pk=board_id)
+
+
+@require_POST
 def delete_board(request, pk):
     """Exclui um quadro e redireciona para a lista de quadros."""
     if not request.user.is_authenticated:
