@@ -11,11 +11,11 @@
 
     <!-- Ações do quadro -->
     <div style="display:flex;gap:10px;margin-bottom:12px;align-items:center;">
-        <button id="btn-edit-board" class="btn btn-primary">Editar quadro</button>
-        <button id="btn-add-new-column" class="btn btn-success">➕ Nova coluna</button>
+        <button id="btn-edit-board" class="btn btn-primary" style="min-width: 140px;">Editar quadro</button>
+        <button id="btn-add-new-column" class="btn btn-success" style="min-width: 140px;">Nova coluna</button>
         <form method="post" action="{% url 'boards:delete_board' board.id %}" onsubmit="return confirm('Deseja realmente excluir este quadro?');" style="margin:0;">
             {% csrf_token %}
-            <button type="submit" class="btn btn-danger btn-primary">Excluir quadro</button>
+            <button type="submit" class="btn btn-danger btn-primary" style="min-width: 140px;">Excluir quadro</button>
         </form>
     </div>
 
@@ -347,10 +347,18 @@ function deleteColumn(columnId) {
         if (response.ok) {
             return response.json().then(data => {
                 if (data.ok) {
+                    // Remover a coluna do DOM instantaneamente
+                    const columnElement = document.querySelector(`[data-column-id="${columnId}"]`);
+                    if (columnElement) {
+                        columnElement.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+                        columnElement.style.opacity = '0';
+                        columnElement.style.transform = 'scale(0.95)';
+                        setTimeout(() => {
+                            columnElement.remove();
+                        }, 300);
+                    }
+                    
                     showToast('Coluna excluída com sucesso', 'success');
-                    setTimeout(() => {
-                        window.location.reload();
-                    }, 600);
                 } else {
                     showToast(data.error || 'Erro ao excluir coluna', 'error');
                 }
@@ -425,11 +433,13 @@ document.addEventListener('DOMContentLoaded', function () {
         dragged.classList.add('dragging');
         e.dataTransfer.effectAllowed = 'move';
         e.dataTransfer.setData('text/plain', dragged.dataset.cardId);
+        e.stopPropagation(); // Impedir que o evento chegue à coluna
     }
 
     function onDragEnd(e) {
         if (dragged) dragged.classList.remove('dragging');
         dragged = null;
+        e.stopPropagation(); // Impedir que o evento chegue à coluna
     }
 
     function onDragOverList(e) {
@@ -489,6 +499,11 @@ document.addEventListener('DOMContentLoaded', function () {
     let draggedColumn = null;
 
     function onColumnDragStart(e) {
+        // Verificar se estamos arrastando um card, não a coluna
+        if (e.target.classList.contains('kanban-card') || e.target.closest('.kanban-card')) {
+            return;
+        }
+        
         draggedColumn = e.currentTarget;
         draggedColumn.classList.add('dragging-column');
         e.dataTransfer.effectAllowed = 'move';
@@ -496,6 +511,11 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     function onColumnDragEnd(e) {
+        // Verificar se estamos arrastando um card, não a coluna
+        if (e.target.classList.contains('kanban-card') || e.target.closest('.kanban-card')) {
+            return;
+        }
+        
         if (draggedColumn) {
             draggedColumn.classList.remove('dragging-column');
             // Remover classe de drop target de todas as colunas
