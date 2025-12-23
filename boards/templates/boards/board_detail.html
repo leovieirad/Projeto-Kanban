@@ -60,7 +60,7 @@
             <div class="kanban-list" data-column-key="{{ c.key }}">
                 {% if c.cards %}
                     {% for card in c.cards %}
-                    <div class="kanban-card" draggable="true" data-card-id="{{ card.id }}" data-column-key="{{ c.key }}" onclick="openCardModal({{ card.id }}, '{{ card.title|escapejs }}', '{{ card.description|escapejs }}', {{ card.column.board.id }}, '{{ c.key }}')" style="cursor: pointer;">
+                    <div class="kanban-card" draggable="true" data-card-id="{{ card.id }}" data-column-key="{{ c.key }}" onclick="openCardModal({{ card.id }}, '{{ card.title|escapejs }}', '{{ card.description|escapejs }}', {{ card.column.board.id }}, '{{ c.class_name }}')" style="cursor: pointer;">
                         <div class="card-title"><strong>{{ card.title }}</strong></div>
                         {% if card.description %}
                         <div class="card-desc">{{ card.description|truncatewords:15 }}</div>
@@ -143,24 +143,26 @@
 <script>
 let currentCardId = null;
 let currentBoardId = null;
-let currentColumnKey = null;
+let currentColumnClass = null;
 
-function openCardModal(cardId, title, description, boardId, columnKey) {
+function openCardModal(cardId, title, description, boardId, columnClass) {
     event.stopPropagation();
     currentCardId = cardId;
     currentBoardId = boardId;
     
-    // Detectar dinamicamente em qual coluna o card está agora
+    // Detectar dinamicamente em qual coluna o card está agora e pegar a classe de cor
     const cardElement = document.querySelector(`[data-card-id="${cardId}"]`);
     if (cardElement) {
         const boardColumn = cardElement.closest('.board-column');
         if (boardColumn) {
-            currentColumnKey = boardColumn.getAttribute('data-column-key');
+            // Pegar a classe que começa com 'col-'
+            const classes = boardColumn.className.split(' ');
+            currentColumnClass = classes.find(cls => cls.startsWith('col-')) || columnClass;
         } else {
-            currentColumnKey = columnKey;
+            currentColumnClass = columnClass;
         }
     } else {
-        currentColumnKey = columnKey;
+        currentColumnClass = columnClass;
     }
     
     document.getElementById('modalCardTitle').textContent = title;
@@ -180,24 +182,33 @@ function openCardModal(cardId, title, description, boardId, columnKey) {
     document.getElementById('editForm').classList.remove('active');
     
     // Aplicar cor ao botão de salvar baseado na coluna onde o card está agora
-    applyColumnColorToSaveButton(currentColumnKey);
+    applyColumnColorToSaveButton(currentColumnClass);
     
     document.getElementById('cardModal').classList.add('active');
     document.body.style.overflow = 'hidden';
 }
 
-function applyColumnColorToSaveButton(columnKey) {
+function applyColumnColorToSaveButton(columnClass) {
     const saveBtn = document.querySelector('.btn-save');
     // Remover todas as classes de cor
-    saveBtn.classList.remove('save-afazer', 'save-progress', 'save-feito');
+    saveBtn.classList.remove('save-afazer', 'save-progress', 'save-feito', 
+                            'save-color-1', 'save-color-2', 'save-color-3', 'save-color-4',
+                            'save-color-5', 'save-color-6', 'save-color-7', 'save-color-8');
     
-    // Adicionar classe baseada na coluna
-    if (columnKey === 'afazer') {
+    // Extrair a classe de cor do columnClass (ex: col-afazer, col-progress, col-color-1)
+    if (columnClass.includes('col-afazer')) {
         saveBtn.classList.add('save-afazer');
-    } else if (columnKey === 'progress') {
+    } else if (columnClass.includes('col-progress')) {
         saveBtn.classList.add('save-progress');
-    } else if (columnKey === 'feito') {
+    } else if (columnClass.includes('col-feito')) {
         saveBtn.classList.add('save-feito');
+    } else if (columnClass.includes('col-color-')) {
+        // Para colunas dinâmicas (col-color-X)
+        const colorMatch = columnClass.match(/col-color-(\d+)/);
+        if (colorMatch) {
+            const colorNum = colorMatch[1];
+            saveBtn.classList.add(`save-color-${colorNum}`);
+        }
     }
 }
 
