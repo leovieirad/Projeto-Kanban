@@ -250,6 +250,38 @@ def reorder_cards(request):
     return JsonResponse({"ok": True})
 
 
+@require_POST
+def reorder_columns(request):
+    """Recebe um JSON com a nova ordem das colunas e atualiza DB.
+
+    Formato esperado (JSON):
+    {"columns": [1, 3, 2]}  # IDs das colunas em nova ordem
+    """
+    if not request.user.is_authenticated:
+        return JsonResponse({"ok": False, "error": "unauthorized"}, status=401)
+    
+    try:
+        payload = json.loads(request.body.decode("utf-8"))
+    except Exception:
+        return JsonResponse({"ok": False, "error": "invalid_json"}, status=400)
+
+    columns_order = payload.get("columns")
+    if not isinstance(columns_order, list):
+        return JsonResponse({"ok": False, "error": "missing_columns"}, status=400)
+
+    # Atualiza posições das colunas dentro de uma transação
+    with transaction.atomic():
+        for pos, col_id in enumerate(columns_order):
+            try:
+                column = Column.objects.select_for_update().get(id=col_id)
+                column.position = pos
+                column.save()
+            except Column.DoesNotExist:
+                continue
+
+    return JsonResponse({"ok": True})
+
+
 # ============== VIEWS DE AUTENTICAÇÃO ==============
 
 def login_view(request):

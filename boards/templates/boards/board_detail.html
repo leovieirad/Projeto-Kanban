@@ -54,7 +54,7 @@
 
     <div class="board-columns">
         {% for c in kanban_columns %}
-        <div class="board-column {{ c.class_name }}" data-column-id="{{ c.column.id }}" data-column-key="{{ c.key }}">
+        <div class="board-column {{ c.class_name }}" draggable="true" data-column-id="{{ c.column.id }}" data-column-key="{{ c.key }}">
             <div class="col-header {{ c.class_name }}">{{ c.display_name }}</div>
 
             <div class="kanban-list" data-column-key="{{ c.key }}">
@@ -396,6 +396,79 @@ document.addEventListener('DOMContentLoaded', function () {
             list.addEventListener('dragleave', onDragLeaveList);
             list.addEventListener('drop', onDropList);
         });
+
+        // Drag-and-drop para colunas
+        document.querySelectorAll('.board-column').forEach(function(col){
+            col.removeEventListener('dragstart', onColumnDragStart);
+            col.removeEventListener('dragend', onColumnDragEnd);
+            col.removeEventListener('dragover', onColumnDragOver);
+            col.removeEventListener('dragleave', onColumnDragLeave);
+            col.removeEventListener('drop', onColumnDrop);
+            col.addEventListener('dragstart', onColumnDragStart);
+            col.addEventListener('dragend', onColumnDragEnd);
+            col.addEventListener('dragover', onColumnDragOver);
+            col.addEventListener('dragleave', onColumnDragLeave);
+            col.addEventListener('drop', onColumnDrop);
+        });
+    }
+
+    // Variável global para controlar qual coluna está sendo arrastada
+    let draggedColumn = null;
+
+    function onColumnDragStart(e) {
+        draggedColumn = e.currentTarget;
+        draggedColumn.classList.add('dragging-column');
+        e.dataTransfer.effectAllowed = 'move';
+        e.dataTransfer.setData('text/plain', draggedColumn.dataset.columnId);
+    }
+
+    function onColumnDragEnd(e) {
+        if (draggedColumn) {
+            draggedColumn.classList.remove('dragging-column');
+            // Remover classe de drop target de todas as colunas
+            document.querySelectorAll('.board-column').forEach(col => {
+                col.classList.remove('drop-target-column');
+            });
+        }
+        draggedColumn = null;
+    }
+
+    function onColumnDragOver(e) {
+        if (!draggedColumn || this === draggedColumn) return;
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'move';
+        this.classList.add('drop-target-column');
+    }
+
+    function onColumnDragLeave(e) {
+        if (e.target === this) {
+            this.classList.remove('drop-target-column');
+        }
+    }
+
+    function onColumnDrop(e) {
+        e.preventDefault();
+        if (!draggedColumn || this === draggedColumn) {
+            this.classList.remove('drop-target-column');
+            return;
+        }
+        
+        this.classList.remove('drop-target-column');
+
+        // Trocar as colunas de posição
+        const boardColumns = document.querySelector('.board-columns');
+        const allColumns = Array.from(boardColumns.querySelectorAll('.board-column'));
+        
+        const draggedIndex = allColumns.indexOf(draggedColumn);
+        const targetIndex = allColumns.indexOf(this);
+        
+        if (draggedIndex > targetIndex) {
+            this.parentNode.insertBefore(draggedColumn, this);
+        } else {
+            this.parentNode.insertBefore(draggedColumn, this.nextSibling);
+        }
+        
+        saveBoardColumnOrder();
     }
 
     function saveBoardOrder() {
@@ -429,6 +502,37 @@ document.addEventListener('DOMContentLoaded', function () {
               }
           }).catch(err => {
               showToast('Erro de rede ao salvar', 'error');
+              console.error(err);
+          });
+    }
+
+    function saveBoardColumnOrder() {
+        const columns = [];
+        document.querySelectorAll('.board-column').forEach(function(col){
+            const colId = parseInt(col.dataset.columnId);
+            if (isNaN(colId) || colId <= 0) return; // ignorar colunas sem id real
+            columns.push(colId);
+        });
+
+        const url = "{% url 'boards:reorder_columns' %}";
+        fetch(url, {
+            method: 'POST',
+            credentials: 'same-origin',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCsrfToken(),
+            },
+            body: JSON.stringify({columns: columns})
+        }).then(resp => resp.json())
+          .then(data => {
+              if (data && data.ok) {
+                  showToast('Coluna movida com sucesso', 'success');
+              } else {
+                  showToast('Falha ao mover coluna', 'error');
+                  console.warn('reorder columns failed', data);
+              }
+          }).catch(err => {
+              showToast('Erro de rede ao mover coluna', 'error');
               console.error(err);
           });
     }
