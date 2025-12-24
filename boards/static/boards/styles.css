@@ -568,6 +568,7 @@ body.dark-mode .btn-new { color: #fff !important; background: var(--primary-stro
   border-radius: 8px 8px 0 0;
   text-align: center;
   margin-bottom: 10px;
+  position: relative;
 }
 .col-afazer .col-header { background: linear-gradient(90deg, #1E90FF, #4682FF); }
 .col-progress .col-header { background: linear-gradient(90deg, #FFC107, #FFB300); color: #222; }
@@ -603,7 +604,7 @@ body.dark-mode .btn-new { color: #fff !important; background: var(--primary-stro
 .col-header.col-color-7 { background: linear-gradient(90deg, #84CC16, #A3E635); }
 .col-header.col-color-8 { background: linear-gradient(90deg, #6366F1, #818CF8); }
 
-.board-column .kanban-list { background: rgba(255,255,255,0.02); padding: 12px; border-radius: 8px; min-height: 220px; display:flex; flex-direction:column; gap:12px; }
+.board-column .kanban-list { background: rgba(255,255,255,0.02); padding: 12px; border-radius: 8px; display:flex; flex-direction:column; gap:12px; }
 .board-column .kanban-card { background: #fff; color: #111; border-radius:10px; padding:14px 12px; box-shadow: 0 6px 18px rgba(16,24,40,0.06); position:relative; overflow:visible; }
 body.dark-mode .board-column .kanban-card { background: #0f1113; color: #e8eef6; }
 
@@ -1587,12 +1588,27 @@ body.dark-mode .board-column.drop-target-column {
 }
 
 /* Estilos para o botão de deletar coluna */
+.btn-delete-column {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(255,255,255,0.2);
+  border: none;
+  color: #fff;
+  cursor: pointer;
+  font-size: 18px;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: 0.2s;
+}
+
 .btn-delete-column:hover {
     background: rgba(255, 59, 48, 0.8) !important;
-    transform: scale(1.1);
+    transform: translateY(-50%) scale(1.1);
 }
 
 .btn-delete-column:active {
-    transform: scale(0.95);
+    transform: translateY(-50%) scale(0.95);
 }
 

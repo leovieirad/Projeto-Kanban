@@ -55,9 +55,9 @@
     <div class="board-columns">
         {% for c in kanban_columns %}
         <div class="board-column {{ c.class_name }}" draggable="true" data-column-id="{{ c.column.id }}" data-column-key="{{ c.key }}">
-            <div class="col-header {{ c.class_name }}" style="display: flex; justify-content: space-between; align-items: center;">
+            <div class="col-header {{ c.class_name }}">
                 <span>{{ c.display_name }}</span>
-                <button type="button" class="btn-delete-column" onclick="deleteColumn({{ c.column.id }})" title="Deletar coluna" style="background: rgba(255,255,255,0.2); border: none; color: #fff; cursor: pointer; font-size: 18px; padding: 4px 8px; border-radius: 4px; transition: 0.2s; hover: background: rgba(255,255,255,0.4);">
+                <button type="button" class="btn-delete-column" onclick="deleteColumn({{ c.column.id }})" title="Deletar coluna">
                     ✕
                 </button>
             </div>
@@ -72,12 +72,12 @@
                         {% endif %}
                     </div>
                     {% endfor %}
+                    <button class="btn btn-primary full-width" style="margin-top: 10px;" onclick="toggleNewCardForm({{ c.column.id }})">+ Adicionar cartão</button>
                 {% else %}
                     <div class="card-empty"><i>Nenhum cartão.</i></div>
+                    <button class="btn btn-primary full-width" style="margin-top: 10px;" onclick="toggleNewCardForm({{ c.column.id }})">+ Adicionar cartão</button>
                 {% endif %}
             </div>
-
-            <button class="btn btn-primary full-width" onclick="toggleNewCardForm({{ c.column.id }})">+ Adicionar cartão</button>
             <div id="new-card-{{ c.column.id }}" style="display:none; margin-top:8px; padding:12px; background: rgba(0,0,0,0.1); border-radius:8px;">
                 <form method="POST" action="{% url 'boards:create_card' c.column.id %}" onsubmit="return validateCardTitle(this)" style="display: flex; flex-direction: column; gap: 10px;">
                     {% csrf_token %}
