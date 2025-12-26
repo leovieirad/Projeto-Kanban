@@ -26,9 +26,17 @@ class Column(models.Model):
 
 class Card(models.Model):
     """Cartão/tarefa dentro de uma coluna."""
+    PRIORITY_CHOICES = [
+        ('low', 'Baixa'),
+        ('medium', 'Média'),
+        ('high', 'Alta'),
+        ('urgent', 'Urgente'),
+    ]
+    
     column = models.ForeignKey(Column, related_name="cards", on_delete=models.CASCADE)
     title = models.CharField(max_length=200)
     description = models.TextField(blank=True)
+    priority = models.CharField(max_length=10, choices=PRIORITY_CHOICES, default='medium')
     created_at = models.DateTimeField(default=timezone.now)
     position = models.PositiveIntegerField(default=0)  # para ordenar dentro da coluna
     is_done = models.BooleanField(default=False)

@@ -1612,3 +1612,54 @@ body.dark-mode .board-column.drop-target-column {
     transform: translateY(-50%) scale(0.95);
 }
 
+/* ===== BADGES DE PRIORIDADE ===== */
+.priority-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    font-size: 14px;
+    flex-shrink: 0;
+    transition: transform 0.2s ease;
+}
+
+.priority-badge:hover {
+    transform: scale(1.15);
+}
+
+/* Cores específicas para cada prioridade */
+.priority-low {
+    background: rgba(46, 213, 115, 0.15);
+}
+
+.priority-medium {
+    background: rgba(255, 193, 7, 0.15);
+}
+
+.priority-high {
+    background: rgba(255, 152, 0, 0.15);
+}
+
+.priority-urgent {
+    background: rgba(244, 67, 54, 0.15);
+}
+
+/* Modo escuro - ajustar opacidade */
+body.dark-mode .priority-low {
+    background: rgba(46, 213, 115, 0.25);
+}
+
+body.dark-mode .priority-medium {
+    background: rgba(255, 193, 7, 0.25);
+}
+
+body.dark-mode .priority-high {
+    background: rgba(255, 152, 0, 0.25);
+}
+
+body.dark-mode .priority-urgent {
+    background: rgba(244, 67, 54, 0.25);
+}
+

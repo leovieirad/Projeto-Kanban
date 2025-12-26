@@ -65,8 +65,13 @@
             <div class="kanban-list" data-column-key="{{ c.key }}">
                 {% if c.cards %}
                     {% for card in c.cards %}
-                    <div class="kanban-card" draggable="true" data-card-id="{{ card.id }}" data-column-key="{{ c.key }}" onclick="openCardModal({{ card.id }}, '{{ card.title|escapejs }}', '{{ card.description|escapejs }}', {{ card.column.board.id }}, '{{ c.class_name }}')" style="cursor: pointer;">
-                        <div class="card-title"><strong>{{ card.title }}</strong></div>
+                    <div class="kanban-card" draggable="true" data-card-id="{{ card.id }}" data-column-key="{{ c.key }}" data-card-priority="{{ card.priority }}" onclick="openCardModal({{ card.id }}, '{{ card.title|escapejs }}', '{{ card.description|escapejs }}', {{ card.column.board.id }}, '{{ c.class_name }}', '{{ card.priority }}')" style="cursor: pointer;">
+                        <div style="display: flex; justify-content: space-between; align-items: start; gap: 8px;">
+                            <div class="card-title"><strong>{{ card.title }}</strong></div>
+                            <span class="priority-badge priority-{{ card.priority }}">
+                                {% if card.priority == 'low' %}🟢{% elif card.priority == 'medium' %}🟡{% elif card.priority == 'high' %}🟠{% elif card.priority == 'urgent' %}🔴{% endif %}
+                            </span>
+                        </div>
                         {% if card.description %}
                         <div class="card-desc">{{ card.description|truncatewords:15 }}</div>
                         {% endif %}
@@ -83,6 +88,12 @@
                     {% csrf_token %}
                     <input type="text" name="title" class="form-control" placeholder="Título do cartão" required style="padding: 8px; border-radius: 6px;">
                     <textarea name="description" class="form-control" placeholder="Descrição (opcional)" style="padding: 8px; border-radius: 6px; min-height: 60px; resize: vertical;"></textarea>
+                    <select name="priority" class="form-control" style="padding: 8px; border-radius: 6px;">
+                        <option value="low">🟢 Baixa</option>
+                        <option value="medium" selected>🟡 Média</option>
+                        <option value="high">🟠 Alta</option>
+                        <option value="urgent">🔴 Urgente</option>
+                    </select>
                     <div style="display: flex; gap: 8px; justify-content: flex-end;">
                         <button type="button" class="btn btn-sm" onclick="toggleNewCardForm({{ c.column.id }})" style="background: transparent; color: var(--muted); border: 1px solid #ccc;">Cancelar</button>
                         <button type="submit" class="btn btn-success btn-sm">Criar</button>
@@ -134,6 +145,12 @@
                         {% csrf_token %}
                         <input type="text" name="title" id="editTitle" placeholder="Título do cartão" required>
                         <textarea name="description" id="editDescription" placeholder="Descrição (opcional)"></textarea>
+                        <select name="priority" id="editPriority" class="form-control" style="padding: 8px; border-radius: 6px; margin-bottom: 10px;">
+                            <option value="low">🟢 Baixa</option>
+                            <option value="medium">🟡 Média</option>
+                            <option value="high">🟠 Alta</option>
+                            <option value="urgent">🔴 Urgente</option>
+                        </select>
                         <div class="btn-group">
                             <button type="submit" class="btn-save">Salvar</button>
                             <button type="button" class="btn-cancel" onclick="toggleEditForm()">Cancelar</button>
@@ -149,6 +166,7 @@
 let currentCardId = null;
 let currentBoardId = null;
 let currentColumnClass = null;
+let currentCardPriority = 'medium';
 
 // Função para obter CSRF Token (disponível globalmente)
 function getCsrfToken() {
@@ -186,10 +204,11 @@ function showToast(message, type) {
     } catch(e) { console.warn('toast fail', e); }
 }
 
-function openCardModal(cardId, title, description, boardId, columnClass) {
+function openCardModal(cardId, title, description, boardId, columnClass, priority = 'medium') {
     event.stopPropagation();
     currentCardId = cardId;
     currentBoardId = boardId;
+    currentCardPriority = priority;
     
     // Detectar dinamicamente em qual coluna o card está agora e pegar a classe de cor
     const cardElement = document.querySelector(`[data-card-id="${cardId}"]`);
@@ -220,6 +239,7 @@ function openCardModal(cardId, title, description, boardId, columnClass) {
     // Preencher form de edição
     document.getElementById('editTitle').value = title;
     document.getElementById('editDescription').value = description;
+    document.getElementById('editPriority').value = priority;
     document.getElementById('editForm').classList.remove('active');
     
     // Aplicar cor ao botão de salvar baseado na coluna onde o card está agora

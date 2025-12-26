@@ -157,6 +157,7 @@ def edit_card(request, card_id):
     if request.method == "POST":
         card.title = request.POST.get("title")
         card.description = request.POST.get("description")
+        card.priority = request.POST.get("priority", "medium")
         card.save()
         messages.success(request, "Cartão atualizado.")
     return redirect("boards:detail", pk=card.column.board.id)
@@ -176,7 +177,8 @@ def create_card(request, column_id):
             Card.objects.create(
                 column=column,
                 title=title,
-                description=request.POST.get("description", "").strip()
+                description=request.POST.get("description", "").strip(),
+                priority=request.POST.get("priority", "medium")
             )
             messages.success(request, "Cartão criado.")
     return redirect("boards:detail", pk=column.board.id)
