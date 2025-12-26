@@ -1663,3 +1663,59 @@ body.dark-mode .priority-urgent {
     background: rgba(244, 67, 54, 0.25);
 }
 
+/* ===== CAMPO DE PRIORIDADE NOS FORMULÁRIOS ===== */
+.priority-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-bottom: 10px;
+}
+
+.priority-label {
+    font-size: 14px;
+    font-weight: 600;
+    color: #555;
+    margin: 0;
+}
+
+body.dark-mode .priority-label {
+    color: #bbb;
+}
+
+.priority-select {
+    padding: 10px 12px !important;
+    border-radius: 8px !important;
+    border: 2px solid #e0e0e0 !important;
+    background: #f8f9fa !important;
+    color: #333 !important;
+    font-size: 15px !important;
+    font-weight: 500 !important;
+    cursor: pointer !important;
+    transition: all 0.2s ease !important;
+}
+
+.priority-select:hover {
+    border-color: #c0c0c0 !important;
+}
+
+.priority-select:focus {
+    border-color: #6C5CE7 !important;
+    background: #fff !important;
+    box-shadow: 0 0 0 3px rgba(108, 92, 231, 0.1) !important;
+}
+
+body.dark-mode .priority-select {
+    background: #2b2d31 !important;
+    color: #eee !important;
+    border-color: #444 !important;
+}
+
+body.dark-mode .priority-select:hover {
+    border-color: #666 !important;
+}
+
+body.dark-mode .priority-select:focus {
+    border-color: #6C5CE7 !important;
+    background: #33353a !important;
+}
+
