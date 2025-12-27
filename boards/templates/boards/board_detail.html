@@ -274,25 +274,39 @@ function openCardModal(cardId, title, description, boardId, columnClass, priorit
 
 function applyColumnColorToSaveButton(columnClass) {
     const saveBtn = document.querySelector('.btn-save');
-    // Remover todas as classes de cor
+    const commentBtn = document.querySelector('.btn-add-comment');
+    
+    // Remover todas as classes de cor do botão salvar
     saveBtn.classList.remove('save-afazer', 'save-progress', 'save-feito', 
                             'save-color-1', 'save-color-2', 'save-color-3', 'save-color-4',
                             'save-color-5', 'save-color-6', 'save-color-7', 'save-color-8');
     
+    // Remover todas as classes de cor do botão comentar
+    commentBtn.classList.remove('save-afazer', 'save-progress', 'save-feito', 
+                            'save-color-1', 'save-color-2', 'save-color-3', 'save-color-4',
+                            'save-color-5', 'save-color-6', 'save-color-7', 'save-color-8');
+    
     // Extrair a classe de cor do columnClass (ex: col-afazer, col-progress, col-color-1)
+    let colorClass = '';
     if (columnClass.includes('col-afazer')) {
-        saveBtn.classList.add('save-afazer');
+        colorClass = 'save-afazer';
     } else if (columnClass.includes('col-progress')) {
-        saveBtn.classList.add('save-progress');
+        colorClass = 'save-progress';
     } else if (columnClass.includes('col-feito')) {
-        saveBtn.classList.add('save-feito');
+        colorClass = 'save-feito';
     } else if (columnClass.includes('col-color-')) {
         // Para colunas dinâmicas (col-color-X)
         const colorMatch = columnClass.match(/col-color-(\d+)/);
         if (colorMatch) {
             const colorNum = colorMatch[1];
-            saveBtn.classList.add(`save-color-${colorNum}`);
+            colorClass = `save-color-${colorNum}`;
         }
+    }
+    
+    // Aplicar a mesma classe de cor para ambos os botões
+    if (colorClass) {
+        saveBtn.classList.add(colorClass);
+        commentBtn.classList.add(colorClass);
     }
 }
 

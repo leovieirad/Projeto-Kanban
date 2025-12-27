@@ -1881,3 +1881,137 @@ body.dark-mode .comment-form textarea:focus {
 .btn-add-comment:active {
     transform: translateY(0);
 }
+
+/* Variações de cor do botão de comentar por coluna */
+.btn-add-comment.save-afazer {
+    background: linear-gradient(135deg, #1E90FF, #4682FF);
+    box-shadow: 0 4px 12px rgba(70, 130, 255, 0.2);
+}
+
+.btn-add-comment.save-afazer:hover {
+    background: linear-gradient(135deg, #1878e8, #3968e8);
+    box-shadow: 0 6px 16px rgba(70, 130, 255, 0.3);
+    transform: translateY(-1px);
+}
+
+.btn-add-comment.save-progress {
+    background: linear-gradient(135deg, #FFC107, #FFB300);
+    color: #222;
+    box-shadow: 0 4px 12px rgba(255, 193, 7, 0.2);
+}
+
+.btn-add-comment.save-progress:hover {
+    background: linear-gradient(135deg, #ffb300, #ff9c00);
+    box-shadow: 0 6px 16px rgba(255, 193, 7, 0.3);
+    color: #222;
+    transform: translateY(-1px);
+}
+
+.btn-add-comment.save-feito {
+    background: linear-gradient(135deg, #34D399, #10B981);
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
+}
+
+.btn-add-comment.save-feito:hover {
+    background: linear-gradient(135deg, #10b981, #059669);
+    box-shadow: 0 6px 16px rgba(16, 185, 129, 0.3);
+    transform: translateY(-1px);
+}
+
+/* Variações de cor do botão de comentar para colunas dinâmicas */
+.btn-add-comment.save-color-1 {
+    background: linear-gradient(135deg, #8B5CF6, #A78BFA);
+    color: #fff;
+    box-shadow: 0 4px 12px rgba(139, 92, 246, 0.2);
+}
+
+.btn-add-comment.save-color-1:hover {
+    background: linear-gradient(135deg, #7c3aed, #9333ea);
+    box-shadow: 0 6px 16px rgba(139, 92, 246, 0.3);
+    transform: translateY(-1px);
+}
+
+.btn-add-comment.save-color-2 {
+    background: linear-gradient(135deg, #EC4899, #F472B6);
+    color: #fff;
+    box-shadow: 0 4px 12px rgba(236, 72, 153, 0.2);
+}
+
+.btn-add-comment.save-color-2:hover {
+    background: linear-gradient(135deg, #db2777, #ec4899);
+    box-shadow: 0 6px 16px rgba(236, 72, 153, 0.3);
+    transform: translateY(-1px);
+}
+
+.btn-add-comment.save-color-3 {
+    background: linear-gradient(135deg, #06B6D4, #22D3EE);
+    color: #003;
+    box-shadow: 0 4px 12px rgba(6, 182, 212, 0.2);
+}
+
+.btn-add-comment.save-color-3:hover {
+    background: linear-gradient(135deg, #0891b2, #06b6d4);
+    box-shadow: 0 6px 16px rgba(6, 182, 212, 0.3);
+    transform: translateY(-1px);
+}
+
+.btn-add-comment.save-color-4 {
+    background: linear-gradient(135deg, #EF4444, #F87171);
+    color: #fff;
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.2);
+}
+
+.btn-add-comment.save-color-4:hover {
+    background: linear-gradient(135deg, #dc2626, #ef4444);
+    box-shadow: 0 6px 16px rgba(239, 68, 68, 0.3);
+    transform: translateY(-1px);
+}
+
+.btn-add-comment.save-color-5 {
+    background: linear-gradient(135deg, #3B82F6, #60A5FA);
+    color: #fff;
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
+}
+
+.btn-add-comment.save-color-5:hover {
+    background: linear-gradient(135deg, #1d4ed8, #3b82f6);
+    box-shadow: 0 6px 16px rgba(59, 130, 246, 0.3);
+    transform: translateY(-1px);
+}
+
+.btn-add-comment.save-color-6 {
+    background: linear-gradient(135deg, #F59E0B, #FBBF24);
+    color: #111;
+    box-shadow: 0 4px 12px rgba(245, 158, 11, 0.2);
+}
+
+.btn-add-comment.save-color-6:hover {
+    background: linear-gradient(135deg, #d97706, #f59e0b);
+    box-shadow: 0 6px 16px rgba(245, 158, 11, 0.3);
+    color: #111;
+    transform: translateY(-1px);
+}
+
+.btn-add-comment.save-color-7 {
+    background: linear-gradient(135deg, #84CC16, #A3E635);
+    color: #fff;
+    box-shadow: 0 4px 12px rgba(132, 204, 22, 0.2);
+}
+
+.btn-add-comment.save-color-7:hover {
+    background: linear-gradient(135deg, #65a30d, #84cc16);
+    box-shadow: 0 6px 16px rgba(132, 204, 22, 0.3);
+    transform: translateY(-1px);
+}
+
+.btn-add-comment.save-color-8 {
+    background: linear-gradient(135deg, #6366F1, #818CF8);
+    color: #fff;
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2);
+}
+
+.btn-add-comment.save-color-8:hover {
+    background: linear-gradient(135deg, #4f46e5, #6366f1);
+    box-shadow: 0 6px 16px rgba(99, 102, 241, 0.3);
+    transform: translateY(-1px);
+}
