@@ -77,10 +77,10 @@
                         {% endif %}
                     </div>
                     {% endfor %}
-                    <button class="btn btn-primary full-width" style="margin-top: 10px;" onclick="toggleNewCardForm({{ c.column.id }})">+ Adicionar cartão</button>
+                    <button class="btn btn-primary full-width" style="margin-top: 10px;" onclick="toggleNewCardForm({{ c.column.id }})">Adicionar cartão</button>
                 {% else %}
                     <div class="card-empty"><i>Nenhum cartão.</i></div>
-                    <button class="btn btn-primary full-width" style="margin-top: 10px;" onclick="toggleNewCardForm({{ c.column.id }})">+ Adicionar cartão</button>
+                    <button class="btn btn-primary full-width" style="margin-top: 10px;" onclick="toggleNewCardForm({{ c.column.id }})">Adicionar cartão</button>
                 {% endif %}
             </div>
             <div id="new-card-{{ c.column.id }}" style="display:none; margin-top:8px; padding:12px; background: rgba(0,0,0,0.1); border-radius:8px;">
@@ -126,6 +126,20 @@
                     Descrição
                 </div>
                 <div class="card-modal-description" id="modalCardDescription"></div>
+            </div>
+            
+            <div class="card-modal-section">
+                <div class="card-modal-section-title">
+                    <span>💬</span>
+                    Comentários
+                </div>
+                <div class="comments-container" id="commentsContainer">
+                    <div class="comments-list" id="commentsList"></div>
+                    <div class="comment-form">
+                        <textarea id="newCommentText" placeholder="Adicionar um comentário..." rows="3"></textarea>
+                        <button type="button" class="btn-add-comment" onclick="addComment()">Comentar</button>
+                    </div>
+                </div>
             </div>
             
             <div class="card-modal-section">
@@ -250,6 +264,9 @@ function openCardModal(cardId, title, description, boardId, columnClass, priorit
     
     // Aplicar cor ao botão de salvar baseado na coluna onde o card está agora
     applyColumnColorToSaveButton(currentColumnClass);
+    
+    // Carregar comentários
+    loadComments();
     
     document.getElementById('cardModal').classList.add('active');
     document.body.style.overflow = 'hidden';
@@ -659,6 +676,101 @@ document.addEventListener('DOMContentLoaded', function () {
     // Anexar eventos de arrastar/soltar após renderização inicial
     attachDnD();
 });
+
+// Funções para gerenciar comentários
+function loadComments() {
+    if (!currentCardId) return;
+    
+    fetch(`/card/${currentCardId}/comments/`)
+        .then(response => response.json())
+        .then(data => {
+            const commentsList = document.getElementById('commentsList');
+            commentsList.innerHTML = '';
+            
+            if (data.comments && data.comments.length > 0) {
+                data.comments.forEach(comment => {
+                    const commentDiv = document.createElement('div');
+                    commentDiv.className = 'comment-item';
+                    commentDiv.innerHTML = `
+                        <div class="comment-header">
+                            <strong>${comment.username}</strong>
+                            <span class="comment-date">${comment.created_at}</span>
+                        </div>
+                        <div class="comment-text">${comment.text}</div>
+                        <button class="btn-delete-comment" onclick="deleteComment(${comment.id})" title="Deletar comentário">✕</button>
+                    `;
+                    commentsList.appendChild(commentDiv);
+                });
+            } else {
+                commentsList.innerHTML = '<p class="no-comments">Nenhum comentário ainda.</p>';
+            }
+        })
+        .catch(error => {
+            console.error('Erro ao carregar comentários:', error);
+            showToast('Erro ao carregar comentários', 'error');
+        });
+}
+
+function addComment() {
+    const textarea = document.getElementById('newCommentText');
+    const text = textarea.value.trim();
+    
+    if (!text) {
+        showToast('O comentário não pode estar vazio', 'error');
+        return;
+    }
+    
+    const formData = new FormData();
+    formData.append('text', text);
+    
+    fetch(`/card/${currentCardId}/comments/add/`, {
+        method: 'POST',
+        credentials: 'same-origin',
+        headers: {
+            'X-CSRFToken': getCsrfToken(),
+        },
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.ok) {
+            textarea.value = '';
+            loadComments();
+            showToast('Comentário adicionado', 'success');
+        } else {
+            showToast(data.error || 'Erro ao adicionar comentário', 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Erro:', error);
+        showToast('Erro ao adicionar comentário', 'error');
+    });
+}
+
+function deleteComment(commentId) {
+    if (!confirm('Deseja excluir este comentário?')) return;
+    
+    fetch(`/comments/${commentId}/delete/`, {
+        method: 'POST',
+        credentials: 'same-origin',
+        headers: {
+            'X-CSRFToken': getCsrfToken(),
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.ok) {
+            loadComments();
+            showToast('Comentário excluído', 'success');
+        } else {
+            showToast(data.error || 'Erro ao excluir comentário', 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Erro:', error);
+        showToast('Erro ao excluir comentário', 'error');
+    });
+}
 
 // Validar que o título do cartão não está vazio
 function validateCardTitle(form) {

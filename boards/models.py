@@ -1,5 +1,6 @@
 from django.db import models
 from django.utils import timezone
+from django.contrib.auth.models import User
 
 class Board(models.Model):
     """Representa um quadro Kanban (ex: Projeto X)."""
@@ -46,3 +47,17 @@ class Card(models.Model):
 
     def __str__(self):
         return self.title
+
+
+class Comment(models.Model):
+    """Comentário em um cartão."""
+    card = models.ForeignKey(Card, related_name="comments", on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    text = models.TextField()
+    created_at = models.DateTimeField(default=timezone.now)
+
+    class Meta:
+        ordering = ["created_at"]
+
+    def __str__(self):
+        return f"Comment by {self.user.username} on {self.card.title}"

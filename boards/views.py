@@ -9,7 +9,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.views.generic import ListView, DetailView
 from django.db.models import Q
-from .models import Board, Column, Card
+from .models import Board, Column, Card, Comment
 import json
 from django.db import transaction
 from django.views.decorators.http import require_http_methods
@@ -427,4 +427,61 @@ def change_password_view(request):
         return redirect("boards:profile")
     # Em GET apenas redireciona para o perfil
     return redirect("boards:profile")
+
+
+@login_required
+def get_card_comments(request, card_id):
+    """Retorna comentários de um card em formato JSON."""
+    card = get_object_or_404(Card, id=card_id)
+    comments = card.comments.select_related('user').all()
+    
+    comments_data = [{
+        'id': comment.id,
+        'text': comment.text,
+        'username': comment.user.username,
+        'created_at': comment.created_at.strftime('%d/%m/%Y %H:%M')
+    } for comment in comments]
+    
+    return JsonResponse({'comments': comments_data})
+
+
+@login_required
+@require_POST
+def add_card_comment(request, card_id):
+    """Adiciona um novo comentário a um card."""
+    card = get_object_or_404(Card, id=card_id)
+    text = request.POST.get('text', '').strip()
+    
+    if not text:
+        return JsonResponse({'ok': False, 'error': 'Comentário não pode estar vazio'}, status=400)
+    
+    comment = Comment.objects.create(
+        card=card,
+        user=request.user,
+        text=text
+    )
+    
+    return JsonResponse({
+        'ok': True,
+        'comment': {
+            'id': comment.id,
+            'text': comment.text,
+            'username': comment.user.username,
+            'created_at': comment.created_at.strftime('%d/%m/%Y %H:%M')
+        }
+    })
+
+
+@login_required
+@require_POST
+def delete_card_comment(request, comment_id):
+    """Deleta um comentário (apenas o autor pode deletar)."""
+    comment = get_object_or_404(Comment, id=comment_id)
+    
+    # Apenas o autor do comentário pode deletá-lo
+    if comment.user != request.user:
+        return JsonResponse({'ok': False, 'error': 'Sem permissão'}, status=403)
+    
+    comment.delete()
+    return JsonResponse({'ok': True})
 

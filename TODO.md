@@ -7,8 +7,8 @@
 - Testes automatizados (testes unitários)
 
 ## 🔄 Melhorias (Prioridade Média)
+- Comentários nos cards
 - Adicionar labels/tags nos cards
-- Sistema de prioridade nos cards
 - Arquivamento de quadros/cards
 - Histórico de alterações (quem moveu o que e quando)
 - Paginação ou lazy loading para muitos cards

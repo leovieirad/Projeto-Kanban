@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Board, Column, Card
+from .models import Board, Column, Card, Comment
 
 @admin.register(Board)
 class BoardAdmin(admin.ModelAdmin):
@@ -18,3 +18,14 @@ class CardAdmin(admin.ModelAdmin):
     list_filter = ['priority', 'is_done', 'column__board']
     search_fields = ['title', 'description']
     list_editable = ['priority', 'is_done']
+
+@admin.register(Comment)
+class CommentAdmin(admin.ModelAdmin):
+    list_display = ['card', 'user', 'text_preview', 'created_at']
+    list_filter = ['created_at', 'user']
+    search_fields = ['text', 'card__title', 'user__username']
+    readonly_fields = ['created_at']
+    
+    def text_preview(self, obj):
+        return obj.text[:50] + '...' if len(obj.text) > 50 else obj.text
+    text_preview.short_description = 'Comentário'
