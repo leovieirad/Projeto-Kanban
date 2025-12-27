@@ -515,8 +515,17 @@ document.addEventListener('DOMContentLoaded', function () {
         const cardId = e.dataTransfer.getData('text/plain');
         const cardElem = document.querySelector('[data-card-id="' + cardId + '"]');
         if (!cardElem) return;
-        // Anexa ao destino do drop (final)
-        this.appendChild(cardElem);
+        
+        // Encontrar o botão "Adicionar cartão" dentro desta lista
+        const addButton = this.querySelector('.btn.btn-primary.full-width');
+        
+        // Inserir o card antes do botão (se existir), caso contrário adiciona no final
+        if (addButton) {
+            this.insertBefore(cardElem, addButton);
+        } else {
+            this.appendChild(cardElem);
+        }
+        
         saveBoardOrder();
     }
 
