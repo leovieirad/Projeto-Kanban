@@ -581,7 +581,24 @@ document.addEventListener('DOMContentLoaded', function () {
     function onDragOverList(e) {
         e.preventDefault();
         e.dataTransfer.dropEffect = 'move';
-        this.classList.add('drop-target');
+        
+        const list = this;
+        list.classList.add('drop-target');
+        
+        // Encontrar o card mais próximo do mouse para inserir antes dele
+        const afterElement = getDragAfterElement(list, e.clientY);
+        
+        if (afterElement == null) {
+            // Inserir no final (antes do botão "Adicionar cartão")
+            const addButton = list.querySelector('.btn.btn-primary.full-width');
+            if (addButton && dragged) {
+                list.insertBefore(dragged, addButton);
+            }
+        } else {
+            if (dragged) {
+                list.insertBefore(dragged, afterElement);
+            }
+        }
     }
 
     function onDragLeaveList(e) {
@@ -591,21 +608,23 @@ document.addEventListener('DOMContentLoaded', function () {
     function onDropList(e) {
         e.preventDefault();
         this.classList.remove('drop-target');
-        const cardId = e.dataTransfer.getData('text/plain');
-        const cardElem = document.querySelector('[data-card-id="' + cardId + '"]');
-        if (!cardElem) return;
-        
-        // Encontrar o botão "Adicionar cartão" dentro desta lista
-        const addButton = this.querySelector('.btn.btn-primary.full-width');
-        
-        // Inserir o card antes do botão (se existir), caso contrário adiciona no final
-        if (addButton) {
-            this.insertBefore(cardElem, addButton);
-        } else {
-            this.appendChild(cardElem);
-        }
-        
         saveBoardOrder();
+    }
+    
+    // Função auxiliar para determinar após qual elemento inserir o card arrastado
+    function getDragAfterElement(list, y) {
+        const draggableElements = [...list.querySelectorAll('.kanban-card:not(.dragging)')];
+        
+        return draggableElements.reduce((closest, child) => {
+            const box = child.getBoundingClientRect();
+            const offset = y - box.top - box.height / 2;
+            
+            if (offset < 0 && offset > closest.offset) {
+                return { offset: offset, element: child };
+            } else {
+                return closest;
+            }
+        }, { offset: Number.NEGATIVE_INFINITY }).element;
     }
 
     function attachDnD() {
