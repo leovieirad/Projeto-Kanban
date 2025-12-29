@@ -56,7 +56,7 @@
         {% for c in kanban_columns %}
         <div class="board-column {{ c.class_name }}" draggable="true" data-column-id="{{ c.column.id }}" data-column-key="{{ c.key }}">
             <div class="col-header {{ c.class_name }}">
-                <span>{{ c.display_name }}</span>
+                <span class="col-title-editable" data-col-id="{{ c.column.id }}" onclick="startEditColumnTitle({{ c.column.id }})">{{ c.display_name }}</span>
                 <button type="button" class="btn-delete-column" onclick="deleteColumn({{ c.column.id }})" title="Deletar coluna">
                     ✕
                 </button>
@@ -385,6 +385,85 @@ function deleteCard() {
         console.error('Erro ao excluir:', error);
         showToast('Erro ao excluir cartão: ' + error.message, 'error');
     });
+}
+
+// Edição inline do título da coluna
+function startEditColumnTitle(columnId) {
+    const span = document.querySelector(`.col-title-editable[data-col-id="${columnId}"]`);
+    if (!span || span.querySelector('input')) return; // já está editando
+    
+    const currentName = span.textContent.trim();
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.value = currentName;
+    input.className = 'col-title-input';
+    
+    // Substituir o span pelo input
+    span.textContent = '';
+    span.appendChild(input);
+    input.focus();
+    input.select();
+    
+    // Salvar ao pressionar Enter
+    input.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            saveColumnTitle(columnId, input, span, currentName);
+        } else if (e.key === 'Escape') {
+            e.preventDefault();
+            cancelEditColumnTitle(span, currentName);
+        }
+    });
+    
+    // Salvar ao perder foco
+    input.addEventListener('blur', function() {
+        setTimeout(() => saveColumnTitle(columnId, input, span, currentName), 150);
+    });
+}
+
+function saveColumnTitle(columnId, input, span, originalName) {
+    const newName = input.value.trim();
+    
+    if (!newName) {
+        cancelEditColumnTitle(span, originalName);
+        showToast('O nome não pode estar vazio', 'error');
+        return;
+    }
+    
+    if (newName === originalName) {
+        cancelEditColumnTitle(span, originalName);
+        return;
+    }
+    
+    const formData = new FormData();
+    formData.append('title', newName);
+    
+    fetch(`/colunas/${columnId}/rename/`, {
+        method: 'POST',
+        credentials: 'same-origin',
+        headers: {
+            'X-CSRFToken': getCsrfToken(),
+            'X-Requested-With': 'XMLHttpRequest'
+        },
+        body: formData
+    }).then(resp => resp.json().then(data => ({ ok: resp.ok, data })))
+      .then(res => {
+        if (res.ok && res.data && res.data.ok) {
+            span.textContent = res.data.title;
+            showToast('Coluna renomeada', 'success');
+        } else {
+            span.textContent = originalName;
+            showToast((res.data && res.data.error) || 'Erro ao renomear coluna', 'error');
+        }
+      }).catch(err => {
+        console.error(err);
+        span.textContent = originalName;
+        showToast('Erro de rede ao renomear', 'error');
+      });
+}
+
+function cancelEditColumnTitle(span, originalName) {
+    span.textContent = originalName;
 }
 
 function deleteColumn(columnId) {

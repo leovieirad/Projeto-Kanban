@@ -226,6 +226,27 @@ def delete_column(request, column_pk):
 
 
 @require_POST
+def rename_column(request, column_pk):
+    """Renomeia o título de uma coluna."""
+    if not request.user.is_authenticated:
+        return JsonResponse({"ok": False, "error": "unauthorized"}, status=401)
+
+    column = get_object_or_404(Column, pk=column_pk)
+    title = (request.POST.get("title") or "").strip()
+    if not title:
+        return JsonResponse({"ok": False, "error": "empty_title"}, status=400)
+
+    column.title = title
+    column.save()
+
+    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+        return JsonResponse({"ok": True, "title": column.title, "column_id": column.id})
+
+    messages.success(request, "Coluna renomeada com sucesso.")
+    return redirect("boards:detail", pk=column.board.id)
+
+
+@require_POST
 def delete_board(request, pk):
     """Exclui um quadro e redireciona para a lista de quadros."""
     if not request.user.is_authenticated:

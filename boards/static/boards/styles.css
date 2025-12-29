@@ -570,6 +570,50 @@ body.dark-mode .btn-new { color: #fff !important; background: var(--primary-stro
   margin-bottom: 10px;
   position: relative;
 }
+
+/* Título da coluna editável ao clicar */
+.col-title-editable {
+  cursor: pointer;
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: background 0.2s ease;
+}
+
+.col-title-editable:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+/* Input inline para edição do título */
+.col-title-input {
+  background: rgba(255, 255, 255, 0.95);
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  border-radius: 6px;
+  padding: 4px 8px;
+  font-size: 14px;
+  font-weight: 700;
+  color: #222;
+  text-align: center;
+  outline: none;
+  min-width: 120px;
+  max-width: 250px;
+}
+
+.col-title-input:focus {
+  border-color: rgba(255, 255, 255, 0.8);
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.2);
+}
+
+body.dark-mode .col-title-input {
+  background: rgba(30, 30, 35, 0.95);
+  color: #fff;
+  border-color: rgba(108, 92, 231, 0.6);
+}
+
+body.dark-mode .col-title-input:focus {
+  border-color: rgba(108, 92, 231, 1);
+  box-shadow: 0 0 0 3px rgba(108, 92, 231, 0.2);
+}
 .col-afazer .col-header { background: linear-gradient(90deg, #1E90FF, #4682FF); }
 .col-progress .col-header { background: linear-gradient(90deg, #FFC107, #FFB300); color: #222; }
 .col-feito .col-header { background: linear-gradient(90deg, #34D399, #10B981); }
