@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Boardly favicon">
+  <defs>
+    <filter id="shadow" x="-8%" y="-8%" width="116%" height="116%">
+      <feDropShadow dx="0" dy="1.2" stdDeviation="1.6" flood-color="#0f172a" flood-opacity="0.22" />
+    </filter>
+  </defs>
+  <!-- Monocolor: roxo sólido -->
+  <rect x="3" y="3" width="58" height="58" rx="16" fill="#6C5CE7" />
+  <g filter="url(#shadow)" fill="#ffffff">
+    <rect x="14" y="12" width="12" height="38" rx="5" />
+    <rect x="28" y="12" width="12" height="30" rx="5" />
+    <rect x="42" y="12" width="12" height="24" rx="5" />
+  </g>
+</svg>
