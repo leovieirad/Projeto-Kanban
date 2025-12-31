@@ -219,23 +219,23 @@ body.dark-mode .form-container {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   border-radius: 16px;
   padding: 2px;
-  margin-bottom: 28px;
-  box-shadow: 0 8px 24px rgba(102, 126, 234, 0.25);
-  transition: all 0.3s ease;
+  margin-bottom: 40px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  transition: 0.2s;
 }
 
 .board-header-card:hover {
-  box-shadow: 0 12px 32px rgba(102, 126, 234, 0.35);
-  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+  transform: translateY(-4px);
 }
 
 body.dark-mode .board-header-card {
   background: linear-gradient(135deg, #5865f2 0%, #7c5ce5 100%);
-  box-shadow: 0 8px 24px rgba(88, 101, 242, 0.3);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 body.dark-mode .board-header-card:hover {
-  box-shadow: 0 12px 32px rgba(88, 101, 242, 0.45);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
 }
 
 .board-header-content {
@@ -307,69 +307,7 @@ body.dark-mode .board-description {
   align-items: center;
 }
 
-.board-action-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 12px 20px;
-  border: none;
-  border-radius: 10px;
-  font-size: 15px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  font-family: inherit;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-}
 
-.board-action-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-}
-
-.board-action-btn:active {
-  transform: translateY(0px);
-}
-
-.btn-icon {
-  font-size: 18px;
-  line-height: 1;
-}
-
-.btn-edit {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-}
-
-.btn-edit:hover {
-  background: linear-gradient(135deg, #5568d3 0%, #653a8b 100%);
-}
-
-.btn-add {
-  background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
-  color: white;
-}
-
-.btn-add:hover {
-  background: linear-gradient(135deg, #0d7d74 0%, #2dd46b 100%);
-}
-
-.btn-delete {
-  background: linear-gradient(135deg, #ee0979 0%, #ff6a00 100%);
-  color: white;
-}
-
-.btn-delete:hover {
-  background: linear-gradient(135deg, #d6086a 0%, #e85d00 100%);
-}
-
-body.dark-mode .board-action-btn {
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-}
-
-body.dark-mode .board-action-btn:hover {
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
-}
 
 /* Responsividade */
 @media (max-width: 768px) {

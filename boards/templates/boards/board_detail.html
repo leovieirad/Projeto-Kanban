@@ -2,7 +2,7 @@
 {% load static %}
 
 {% block content %}
-<div class="container mt-4">
+<div class="container" style="padding-top: 24px;">
 
     <!-- Cabeçalho Modernizado do Quadro -->
     <div class="board-header-card">
@@ -16,19 +16,16 @@
             </div>
             
             <div class="board-actions">
-                <button id="btn-edit-board" class="board-action-btn btn-edit" title="Editar quadro">
-                    <span class="btn-icon"></span>
-                    <span class="btn-text">Editar quadro</span>
+                <button id="btn-edit-board" class="btn btn-primary" title="Editar quadro">
+                    Editar quadro
                 </button>
-                <button id="btn-add-new-column" class="board-action-btn btn-add" title="Adicionar nova coluna">
-                    <span class="btn-icon"></span>
-                    <span class="btn-text">Nova coluna</span>
+                <button id="btn-add-new-column" class="btn btn-success" title="Adicionar nova coluna">
+                    Nova coluna
                 </button>
                 <form method="post" action="{% url 'boards:delete_board' board.id %}" onsubmit="return confirm('⚠️ Deseja realmente excluir este quadro? Esta ação não pode ser desfeita.');" style="margin:0;">
                     {% csrf_token %}
-                    <button type="submit" class="board-action-btn btn-delete" title="Excluir quadro">
-                        <span class="btn-icon"></span>
-                        <span class="btn-text">Excluir quadro</span>
+                    <button type="submit" class="btn btn-danger" title="Excluir quadro">
+                        Excluir quadro
                     </button>
                 </form>
             </div>
