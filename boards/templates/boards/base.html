@@ -16,10 +16,10 @@
   <a href="{% url 'boards:list' %}" class="brand-logo">Boardly</a>
 
   <nav style="display: flex; align-items: center; gap: 12px;">
-    <a href="{% url 'boards:list' %}" style="color: var(--primary); text-decoration: none; font-weight: 500;">Quadros</a>
+    <a href="{% url 'boards:list' %}" class="nav-link">Quadros</a>
     {% if user.is_authenticated %}
       <span style="color: #999;">|</span>
-      <a href="{% url 'boards:profile' %}" style="color: var(--primary); text-decoration: none; font-weight: 500;">Perfil</a>
+      <a href="{% url 'boards:profile' %}" class="nav-link">Perfil</a>
     {% endif %}
   </nav>
 

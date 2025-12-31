@@ -67,6 +67,8 @@ body {
   font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "Liberation Sans", sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  margin: 0;
+  padding: 0;
 }
 
 /* Modo CLARO */
@@ -112,10 +114,16 @@ input:focus, textarea:focus {
   border-bottom: 1px solid #ddd;
   
   justify-content: space-between;
-  padding: 10px 20px;
+  padding: 0 20px;
   height: 70px;        
   box-sizing: border-box;
   min-height: 70px;
+  margin: 0;
+  width: 100%;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: #f5f7fa;
 }
 
 body.dark-mode .top-nav {
@@ -179,6 +187,29 @@ body.dark-mode .nav-logout-btn:hover {
 a { color: var(--primary); text-decoration: none; }
 
 .top-nav a:hover, a:hover { text-decoration: underline; }
+
+/* Links de navegação com hover elevado */
+.nav-link {
+  color: var(--primary);
+  text-decoration: none !important;
+  font-weight: 500;
+  padding: 8px 12px;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  display: inline-block;
+}
+
+.nav-link:hover {
+  text-decoration: none !important;
+  transform: translateY(-2px);
+  background: rgba(108, 92, 231, 0.08);
+  box-shadow: 0 2px 8px rgba(108, 92, 231, 0.15);
+}
+
+body.dark-mode .nav-link:hover {
+  background: rgba(108, 92, 231, 0.15);
+  box-shadow: 0 2px 8px rgba(108, 92, 231, 0.25);
+}
 
 body.dark-mode .top-nav a,
 body.dark-mode a { color: var(--primary); }
@@ -496,10 +527,10 @@ body.dark-mode .textarea {
 .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(108,92,231,0.18); }
 
 /* Estilos gerais de botões usados nos templates */
-.btn { font-weight: 600; border-radius: 8px; padding: 10px 16px; cursor: pointer; font-size: 15px; }
+.btn { font-weight: 600; border-radius: 8px; padding: 10px 16px; cursor: pointer; font-size: 15px; transition: all 0.2s ease; }
 
 .btn-success { background: #2ea44f; color: #fff; border: none; padding: 10px 16px; font-weight: 600; }
-.btn-success:hover { background: #23863a; }
+.btn-success:hover { background: #23863a; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(46, 164, 79, 0.3); }
 
 .btn-link { background: transparent; color: var(--primary); border: none; padding: 0; text-decoration: underline; }
 body.dark-mode .btn-link { color: var(--primary); }
@@ -598,8 +629,8 @@ body.dark-mode .btn-secondary:hover { background: rgba(255,255,255,0.03); }
 }
 
 .btn-secondary:hover { text-decoration: none !important; }
-.btn-new { padding: 12px 18px; font-size: 16px; background: var(--primary-strong); color: #fff !important; box-shadow: 0 8px 26px rgba(92,68,199,0.12); border-radius: 12px; border: none; display: inline-flex; align-items: center; justify-content: center; }
-.btn-new:hover { transform: translateY(-2px); }
+.btn-new { padding: 12px 18px; font-size: 16px; background: var(--primary-strong); color: #fff !important; box-shadow: 0 8px 26px rgba(92,68,199,0.12); border-radius: 12px; border: none; display: inline-flex; align-items: center; justify-content: center; text-decoration: none; }
+.btn-new:hover { transform: translateY(-2px); text-decoration: none; }
 .btn-open {
   min-width: 110px;
   display: inline-flex;
@@ -607,7 +638,9 @@ body.dark-mode .btn-secondary:hover { background: rgba(255,255,255,0.03); }
   justify-content: center;
   padding: 8px 14px; /* match .btn-secondary spacing */
   text-align: center;
+  transition: all 0.2s ease;
 }
+.btn-open:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); }
 
 /* Botão de exclusão (perigo) */
 .btn-danger {
@@ -634,7 +667,7 @@ body.dark-mode .btn-danger:hover {
 }
 
 
-.btn-danger:hover { background: rgba(220,38,38,0.06); }
+.btn-danger:hover { background: rgba(220,38,38,0.06); transform: translateY(-2px); box-shadow: 0 4px 12px rgba(220, 38, 38, 0.2); }
 
 /* Garantir texto branco do botão '+ Novo quadro' no modo escuro */
 body.dark-mode .btn-new { color: #fff !important; background: var(--primary-strong); box-shadow: 0 8px 28px rgba(88,68,199,0.16); }
