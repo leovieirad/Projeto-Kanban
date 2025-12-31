@@ -4,19 +4,35 @@
 {% block content %}
 <div class="container mt-4">
 
-    <h1>{{ board.title }}</h1>
-    <p>{{ board.description }}</p>
-
-    <!-- As colunas são fixas: A Fazer / Em Progresso / Feito. A criação de novas colunas foi desabilitada. -->
-
-    <!-- Ações do quadro -->
-    <div style="display:flex;gap:10px;margin-bottom:12px;align-items:center;">
-        <button id="btn-edit-board" class="btn btn-primary" style="min-width: 140px;">Editar quadro</button>
-        <button id="btn-add-new-column" class="btn btn-success" style="min-width: 140px;">Nova coluna</button>
-        <form method="post" action="{% url 'boards:delete_board' board.id %}" onsubmit="return confirm('Deseja realmente excluir este quadro?');" style="margin:0;">
-            {% csrf_token %}
-            <button type="submit" class="btn btn-danger btn-primary" style="min-width: 140px;">Excluir quadro</button>
-        </form>
+    <!-- Cabeçalho Modernizado do Quadro -->
+    <div class="board-header-card">
+        <div class="board-header-content">
+            <div class="board-info">
+                <div class="board-title-section">
+                    <span class="board-icon"></span>
+                    <h1 class="board-main-title">{{ board.title }}</h1>
+                </div>
+                <p class="board-description">{{ board.description }}</p>
+            </div>
+            
+            <div class="board-actions">
+                <button id="btn-edit-board" class="board-action-btn btn-edit" title="Editar quadro">
+                    <span class="btn-icon"></span>
+                    <span class="btn-text">Editar quadro</span>
+                </button>
+                <button id="btn-add-new-column" class="board-action-btn btn-add" title="Adicionar nova coluna">
+                    <span class="btn-icon"></span>
+                    <span class="btn-text">Nova coluna</span>
+                </button>
+                <form method="post" action="{% url 'boards:delete_board' board.id %}" onsubmit="return confirm('⚠️ Deseja realmente excluir este quadro? Esta ação não pode ser desfeita.');" style="margin:0;">
+                    {% csrf_token %}
+                    <button type="submit" class="board-action-btn btn-delete" title="Excluir quadro">
+                        <span class="btn-icon"></span>
+                        <span class="btn-text">Excluir quadro</span>
+                    </button>
+                </form>
+            </div>
+        </div>
     </div>
 
     <!-- Formulário escondido -->
@@ -35,7 +51,7 @@
                     <textarea name="description" id="id_description" class="form-control" placeholder="Descreva o propósito deste quadro...">{{ board.description }}</textarea>
                 </div>
             {% endif %}
-            <button type="submit" class="btn btn-success">💾 Salvar alterações</button>
+            <button type="submit" class="btn btn-success">Salvar alterações</button>
         </form>
         <hr>
     </div>
