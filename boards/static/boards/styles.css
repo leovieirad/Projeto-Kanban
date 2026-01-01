@@ -2234,3 +2234,121 @@ body.dark-mode .comment-form textarea:focus {
     box-shadow: 0 6px 16px rgba(99, 102, 241, 0.3);
     transform: translateY(-1px);
 }
+/* === Estilos para Data de Vencimento === */
+.card-due-date {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    font-weight: 500;
+    margin-top: 8px;
+    padding: 4px 8px;
+    border-radius: 4px;
+}
+
+.card-due-date.overdue {
+    background: rgba(217, 58, 73, 0.2);
+    color: #d73a49;
+}
+
+.card-due-date.due-soon {
+    background: rgba(245, 158, 11, 0.2);
+    color: #f59e0b;
+}
+
+.card-due-date.on-time {
+    background: rgba(46, 164, 80, 0.2);
+    color: #2ea44f;
+}
+
+body.dark-mode .card-due-date.overdue {
+    background: rgba(217, 58, 73, 0.15);
+    color: #ff8787;
+}
+
+body.dark-mode .card-due-date.due-soon {
+    background: rgba(245, 158, 11, 0.15);
+    color: #fbbf24;
+}
+
+body.dark-mode .card-due-date.on-time {
+    background: rgba(46, 164, 80, 0.15);
+    color: #51cf66;
+}
+
+/* Campo de data no formulário */
+input[type="date"] {
+    font-size: 14px;
+    padding: 8px;
+    border-radius: 6px;
+    border: 1px solid #ddd;
+}
+
+/* Input de data dentro do modal de edição */
+.card-modal-edit-form input[type="date"] {
+    padding: 10px 14px;
+    border: 2px solid #dfe1e6;
+}
+
+body.dark-mode input[type="date"] {
+    background: #2b2d31;
+    color: #fff;
+    border: 1px solid #555;
+}
+
+body.dark-mode .card-modal-edit-form input[type="date"] {
+    border: 2px solid #3a3b3f;
+}
+
+input[type="date"]:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(108,92,231,0.12);
+    border-color: var(--primary);
+}
+
+/* Data no modal */
+.card-modal-due-date {
+    padding: 8px 0;
+}
+/* Botão para limpar data de vencimento */
+.btn-clear-date {
+    padding: 0;
+    background: rgba(220, 53, 69, 0.1);
+    color: #dc3545;
+    border: 1px solid rgba(220, 53, 69, 0.3);
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 600;
+    transition: all 0.2s ease;
+    width: 40px;
+    height: 100%;
+    min-height: 46px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    box-sizing: border-box;
+}
+
+.btn-clear-date:hover {
+    background: rgba(220, 53, 69, 0.2);
+    border-color: #dc3545;
+    transform: scale(1.05);
+}
+
+body.dark-mode .btn-clear-date {
+    background: rgba(220, 53, 69, 0.15);
+    color: #ff6b6b;
+    border-color: rgba(220, 53, 69, 0.4);
+}
+
+body.dark-mode .btn-clear-date:hover {
+    background: rgba(220, 53, 69, 0.25);
+    border-color: #ff6b6b;
+}
+
+
+
+
+

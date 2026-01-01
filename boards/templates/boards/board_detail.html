@@ -78,7 +78,7 @@
             <div class="kanban-list" data-column-key="{{ c.key }}">
                 {% if c.cards %}
                     {% for card in c.cards %}
-                    <div class="kanban-card" draggable="true" data-card-id="{{ card.id }}" data-column-key="{{ c.key }}" data-card-priority="{{ card.priority }}" onclick="openCardModal({{ card.id }}, '{{ card.title|escapejs }}', '{{ card.description|escapejs }}', {{ card.column.board.id }}, '{{ c.class_name }}', '{{ card.priority }}')" style="cursor: pointer;">
+                    <div class="kanban-card" draggable="true" data-card-id="{{ card.id }}" data-column-key="{{ c.key }}" data-card-priority="{{ card.priority }}" data-card-due-date="{% if card.due_date %}{{ card.due_date|date:'Y-m-d' }}{% endif %}" onclick="openCardModal({{ card.id }}, '{{ card.title|escapejs }}', '{{ card.description|escapejs }}', {{ card.column.board.id }}, '{{ c.class_name }}', '{{ card.priority }}', '{% if card.due_date %}{{ card.due_date|date:'Y-m-d' }}{% endif %}')" style="cursor: pointer;">
                         <div style="display: flex; justify-content: space-between; align-items: start; gap: 8px;">
                             <div class="card-title"><strong>{{ card.title }}</strong></div>
                             <span class="priority-badge priority-{{ card.priority }}">
@@ -87,6 +87,11 @@
                         </div>
                         {% if card.description %}
                         <div class="card-desc">{{ card.description|truncatewords:15 }}</div>
+                        {% endif %}
+                        {% if card.due_date %}
+                        <div class="card-due-date {% if card.get_due_date_status %}{{ card.get_due_date_status }}{% endif %}">
+                            📅 Vencimento: {{ card.due_date|date:'d/m/Y' }}
+                        </div>
                         {% endif %}
                     </div>
                     {% endfor %}
@@ -101,6 +106,10 @@
                     {% csrf_token %}
                     <input type="text" name="title" class="form-control" placeholder="Título do cartão" required style="padding: 8px; border-radius: 6px;">
                     <textarea name="description" class="form-control" placeholder="Descrição (opcional)" style="padding: 8px; border-radius: 6px; min-height: 60px; resize: vertical;"></textarea>
+                    <div class="priority-field">
+                        <label for="due-date-{{ c.column.id }}" class="priority-label">📅 Vencimento</label>
+                        <input type="date" name="due_date" id="due-date-{{ c.column.id }}" class="form-control" style="padding: 8px; border-radius: 6px;">
+                    </div>
                     <div class="priority-field">
                         <label for="priority-{{ c.column.id }}" class="priority-label">⚡ Prioridade</label>
                         <select name="priority" id="priority-{{ c.column.id }}" class="form-control priority-select">
@@ -141,6 +150,14 @@
                 <div class="card-modal-description" id="modalCardDescription"></div>
             </div>
             
+            <div class="card-modal-section" id="dueDateSection" style="display: none;">
+                <div class="card-modal-section-title">
+                    <span>📅</span>
+                    Data de Vencimento
+                </div>
+                <div class="card-modal-due-date" id="modalCardDueDate"></div>
+            </div>
+            
             <div class="card-modal-section">
                 <div class="card-modal-section-title">
                     <span>💬</span>
@@ -175,6 +192,13 @@
                         {% csrf_token %}
                         <input type="text" name="title" id="editTitle" placeholder="Título do cartão" required>
                         <textarea name="description" id="editDescription" placeholder="Descrição (opcional)"></textarea>
+                        <div class="priority-field">
+                            <label for="editDueDate" class="priority-label">📅 Vencimento</label>
+                            <div style="display: flex; gap: 8px; align-items: stretch;">
+                                <input type="date" name="due_date" id="editDueDate" class="date-input-with-clear" style="flex: 1;">
+                                <button type="button" class="btn-clear-date" onclick="clearDueDate()" title="Remover data de vencimento">✕</button>
+                            </div>
+                        </div>
                         <div class="priority-field">
                             <label for="editPriority" class="priority-label">⚡ Prioridade</label>
                             <select name="priority" id="editPriority" class="form-control priority-select">
@@ -237,7 +261,7 @@ function showToast(message, type) {
     } catch(e) { console.warn('toast fail', e); }
 }
 
-function openCardModal(cardId, title, description, boardId, columnClass, priority = 'medium') {
+function openCardModal(cardId, title, description, boardId, columnClass, priority = 'medium', dueDate = '') {
     event.stopPropagation();
     currentCardId = cardId;
     currentBoardId = boardId;
@@ -269,9 +293,36 @@ function openCardModal(cardId, title, description, boardId, columnClass, priorit
         descElement.classList.add('empty');
     }
     
+    // Exibir data de vencimento se existir
+    const dueDateSection = document.getElementById('dueDateSection');
+    const dueDateDisplay = document.getElementById('modalCardDueDate');
+    if (dueDate) {
+        const dateObj = new Date(dueDate + 'T00:00:00');
+        const formattedDate = dateObj.toLocaleDateString('pt-BR');
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const daysUntilDue = Math.ceil((dateObj - today) / (1000 * 60 * 60 * 24));
+        
+        let status = 'on-time';
+        let statusText = '✅ No prazo';
+        if (daysUntilDue < 0) {
+            status = 'overdue';
+            statusText = '⚠️ Vencido';
+        } else if (daysUntilDue <= 3) {
+            status = 'due-soon';
+            statusText = '⏰ Vence em breve';
+        }
+        
+        dueDateDisplay.innerHTML = `<div class="card-due-date ${status}">${formattedDate} - ${statusText}</div>`;
+        dueDateSection.style.display = 'block';
+    } else {
+        dueDateSection.style.display = 'none';
+    }
+    
     // Preencher form de edição
     document.getElementById('editTitle').value = title;
     document.getElementById('editDescription').value = description;
+    document.getElementById('editDueDate').value = dueDate;
     document.getElementById('editPriority').value = priority;
     document.getElementById('editForm').classList.remove('active');
     
@@ -339,6 +390,11 @@ function closeCardModalOnOverlay(event) {
 function toggleEditForm() {
     const form = document.getElementById('editForm');
     form.classList.toggle('active');
+}
+
+function clearDueDate() {
+    document.getElementById('editDueDate').value = '';
+    showToast('Data de vencimento removida. Salve para confirmar.', 'success');
 }
 
 function submitCardEdit(event) {

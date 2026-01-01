@@ -1,6 +1,7 @@
 from django.db import models
 from django.utils import timezone
 from django.contrib.auth.models import User
+from datetime import date
 
 class Board(models.Model):
     """Representa um quadro Kanban (ex: Projeto X)."""
@@ -39,6 +40,7 @@ class Card(models.Model):
     description = models.TextField(blank=True)
     priority = models.CharField(max_length=10, choices=PRIORITY_CHOICES, default='medium')
     created_at = models.DateTimeField(default=timezone.now)
+    due_date = models.DateField(null=True, blank=True)
     position = models.PositiveIntegerField(default=0)  # para ordenar dentro da coluna
     is_done = models.BooleanField(default=False)
 
@@ -47,6 +49,21 @@ class Card(models.Model):
 
     def __str__(self):
         return self.title
+    
+    def get_due_date_status(self):
+        """Retorna o status da data de vencimento: 'overdue', 'due-soon', 'on-time' ou None."""
+        if not self.due_date:
+            return None
+        
+        today = date.today()
+        days_until_due = (self.due_date - today).days
+        
+        if days_until_due < 0:
+            return 'overdue'
+        elif days_until_due <= 3:
+            return 'due-soon'
+        else:
+            return 'on-time'
 
 
 class Comment(models.Model):

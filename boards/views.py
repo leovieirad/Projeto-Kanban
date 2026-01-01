@@ -158,6 +158,11 @@ def edit_card(request, card_id):
         card.title = request.POST.get("title")
         card.description = request.POST.get("description")
         card.priority = request.POST.get("priority", "medium")
+        due_date = request.POST.get("due_date", "").strip()
+        if due_date:
+            card.due_date = due_date
+        else:
+            card.due_date = None
         card.save()
         messages.success(request, "Cartão atualizado.")
     return redirect("boards:detail", pk=card.column.board.id)
@@ -174,11 +179,13 @@ def create_card(request, column_id):
         if not title:
             messages.error(request, "O título do cartão é obrigatório.")
         else:
+            due_date = request.POST.get("due_date", "").strip()
             Card.objects.create(
                 column=column,
                 title=title,
                 description=request.POST.get("description", "").strip(),
-                priority=request.POST.get("priority", "medium")
+                priority=request.POST.get("priority", "medium"),
+                due_date=due_date if due_date else None
             )
             messages.success(request, "Cartão criado.")
     return redirect("boards:detail", pk=column.board.id)
