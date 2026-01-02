@@ -49,4 +49,8 @@ urlpatterns = [
     path("card/<int:card_id>/comments/", views.get_card_comments, name="get_card_comments"),
     path("card/<int:card_id>/comments/add/", views.add_card_comment, name="add_card_comment"),
     path("comments/<int:comment_id>/delete/", views.delete_card_comment, name="delete_card_comment"),
+    
+    # Tarefas atribuídas
+    path("minha-tasks/", views.my_tasks_view, name="my_tasks"),
+    path("api/users/", views.get_users_json, name="get_users"),
 ]

@@ -163,6 +163,16 @@ def edit_card(request, card_id):
             card.due_date = due_date
         else:
             card.due_date = None
+        
+        assigned_to_id = request.POST.get("assigned_to", "").strip()
+        if assigned_to_id:
+            try:
+                card.assigned_to = User.objects.get(id=assigned_to_id)
+            except User.DoesNotExist:
+                card.assigned_to = None
+        else:
+            card.assigned_to = None
+        
         card.save()
         messages.success(request, "Cartão atualizado.")
     return redirect("boards:detail", pk=card.column.board.id)
@@ -180,12 +190,21 @@ def create_card(request, column_id):
             messages.error(request, "O título do cartão é obrigatório.")
         else:
             due_date = request.POST.get("due_date", "").strip()
+            assigned_to_id = request.POST.get("assigned_to", "").strip()
+            assigned_to = None
+            if assigned_to_id:
+                try:
+                    assigned_to = User.objects.get(id=assigned_to_id)
+                except User.DoesNotExist:
+                    assigned_to = None
+            
             Card.objects.create(
                 column=column,
                 title=title,
                 description=request.POST.get("description", "").strip(),
                 priority=request.POST.get("priority", "medium"),
-                due_date=due_date if due_date else None
+                due_date=due_date if due_date else None,
+                assigned_to=assigned_to
             )
             messages.success(request, "Cartão criado.")
     return redirect("boards:detail", pk=column.board.id)
@@ -513,3 +532,41 @@ def delete_card_comment(request, comment_id):
     comment.delete()
     return JsonResponse({'ok': True})
 
+
+@login_required
+def get_users_json(request):
+    """Retorna lista de usuários em JSON para seleção de responsável."""
+    users = User.objects.filter(is_active=True).values('id', 'username', 'first_name', 'last_name').order_by('username')
+    users_list = []
+    for user in users:
+        full_name = user['first_name'] or user['username']
+        if user['last_name']:
+            full_name += f" {user['last_name']}"
+        users_list.append({
+            'id': user['id'],
+            'username': user['username'],
+            'display_name': full_name
+        })
+    return JsonResponse({'users': users_list})
+
+
+@login_required
+def my_tasks_view(request):
+    """Lista todas as tarefas atribuídas ao usuário atual."""
+    cards = Card.objects.filter(assigned_to=request.user).select_related('column', 'column__board').order_by('-created_at')
+    
+    # Agrupar por quadro
+    cards_by_board = {}
+    for card in cards:
+        board = card.column.board
+        if board.id not in cards_by_board:
+            cards_by_board[board.id] = {
+                'board': board,
+                'cards': []
+            }
+        cards_by_board[board.id]['cards'].append(card)
+    
+    return render(request, 'boards/my_tasks.html', {
+        'cards_by_board': cards_by_board,
+        'total_tasks': cards.count()
+    })

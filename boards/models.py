@@ -41,6 +41,7 @@ class Card(models.Model):
     priority = models.CharField(max_length=10, choices=PRIORITY_CHOICES, default='medium')
     created_at = models.DateTimeField(default=timezone.now)
     due_date = models.DateField(null=True, blank=True)
+    assigned_to = models.ForeignKey(User, null=True, blank=True, on_delete=models.SET_NULL, related_name="assigned_cards")
     position = models.PositiveIntegerField(default=0)  # para ordenar dentro da coluna
     is_done = models.BooleanField(default=False)
 

@@ -1,0 +1,83 @@
+{% extends "boards/base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container" style="padding-top: 24px;">
+    <!-- Cabeçalho -->
+    <div class="board-header-card">
+        <div class="board-header-content">
+            <div class="board-info">
+                <div class="board-title-section">
+                    <span style="font-size: 28px;">👤</span>
+                    <h1 class="board-main-title">Minhas Tarefas</h1>
+                </div>
+                <p class="board-description">Total de tarefas atribuídas: {{ total_tasks }}</p>
+            </div>
+            
+            <div class="board-actions">
+                <a href="{% url 'boards:list' %}" class="btn btn-primary">
+                    ← Voltar aos Quadros
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lista de Tarefas -->
+    {% if cards_by_board %}
+        {% for board_id, board_data in cards_by_board.items %}
+            <div style="margin-bottom: 32px;">
+                <h2 style="color: var(--primary); margin-bottom: 16px;">📌 {{ board_data.board.title }}</h2>
+                
+                <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px;">
+                    {% for card in board_data.cards %}
+                        <div class="kanban-card" style="cursor: pointer; transition: all 0.2s ease;" 
+                             onclick="window.location.href='{% url 'boards:detail' board_data.board.id %}#card-{{ card.id }}'">
+                            <div style="display: flex; justify-content: space-between; align-items: start; gap: 8px;">
+                                <div style="flex: 1;">
+                                    <div class="card-title"><strong>{{ card.title }}</strong></div>
+                                    <div style="font-size: 0.85em; color: var(--muted); margin-top: 4px;">
+                                        📂 {{ card.column.title }}
+                                    </div>
+                                </div>
+                                <span class="priority-badge priority-{{ card.priority }}">
+                                    {% if card.priority == 'low' %}🟢{% elif card.priority == 'medium' %}🟡{% elif card.priority == 'high' %}🟠{% elif card.priority == 'urgent' %}🔴{% endif %}
+                                </span>
+                            </div>
+                            
+                            {% if card.description %}
+                            <div class="card-desc" style="margin-top: 8px;">{{ card.description|truncatewords:20 }}</div>
+                            {% endif %}
+                            
+                            {% if card.due_date %}
+                            <div class="card-due-date {% if card.get_due_date_status %}{{ card.get_due_date_status }}{% endif %}" style="margin-top: 8px;">
+                                📅 {{ card.due_date|date:'d/m/Y' }}
+                            </div>
+                            {% endif %}
+                            
+                            {% if card.is_done %}
+                            <div style="margin-top: 8px; padding: 4px 8px; background: rgba(76, 175, 80, 0.2); border-radius: 4px; font-size: 0.85em; color: #4caf50;">
+                                ✅ Concluído
+                            </div>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        {% endfor %}
+    {% else %}
+        <div style="text-align: center; padding: 48px 24px; background: rgba(0,0,0,0.05); border-radius: 8px;">
+            <div style="font-size: 48px; margin-bottom: 16px;">📭</div>
+            <h2>Nenhuma tarefa atribuída</h2>
+            <p style="color: var(--muted); margin-top: 8px;">Você não tem tarefas atribuídas no momento.</p>
+            <a href="{% url 'boards:list' %}" class="btn btn-primary" style="margin-top: 16px;">Ir para Quadros</a>
+        </div>
+    {% endif %}
+</div>
+
+<style>
+    .kanban-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+    }
+</style>
+{% endblock %}

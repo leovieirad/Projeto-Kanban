@@ -78,7 +78,7 @@
             <div class="kanban-list" data-column-key="{{ c.key }}">
                 {% if c.cards %}
                     {% for card in c.cards %}
-                    <div class="kanban-card" draggable="true" data-card-id="{{ card.id }}" data-column-key="{{ c.key }}" data-card-priority="{{ card.priority }}" data-card-due-date="{% if card.due_date %}{{ card.due_date|date:'Y-m-d' }}{% endif %}" onclick="openCardModal({{ card.id }}, '{{ card.title|escapejs }}', '{{ card.description|escapejs }}', {{ card.column.board.id }}, '{{ c.class_name }}', '{{ card.priority }}', '{% if card.due_date %}{{ card.due_date|date:'Y-m-d' }}{% endif %}')" style="cursor: pointer;">
+                    <div class="kanban-card" draggable="true" data-card-id="{{ card.id }}" data-column-key="{{ c.key }}" data-card-priority="{{ card.priority }}" data-card-due-date="{% if card.due_date %}{{ card.due_date|date:'Y-m-d' }}{% endif %}" onclick="openCardModal({{ card.id }}, '{{ card.title|escapejs }}', '{{ card.description|escapejs }}', {{ card.column.board.id }}, '{{ c.class_name }}', '{{ card.priority }}', '{% if card.due_date %}{{ card.due_date|date:'Y-m-d' }}{% endif %}', '{% if card.assigned_to %}{{ card.assigned_to.id }}{% endif %}')" style="cursor: pointer;">
                         <div style="display: flex; justify-content: space-between; align-items: start; gap: 8px;">
                             <div class="card-title"><strong>{{ card.title }}</strong></div>
                             <span class="priority-badge priority-{{ card.priority }}">
@@ -91,6 +91,11 @@
                         {% if card.due_date %}
                         <div class="card-due-date {% if card.get_due_date_status %}{{ card.get_due_date_status }}{% endif %}">
                             📅 Vencimento: {{ card.due_date|date:'d/m/Y' }}
+                        </div>
+                        {% endif %}
+                        {% if card.assigned_to %}
+                        <div class="card-assigned-to" style="margin-top: 8px; padding-top: 8px; border-top: 1px solid rgba(255,255,255,0.2); font-size: 0.85em;">
+                            👤 {{ card.assigned_to.get_full_name|default:card.assigned_to.username }}
                         </div>
                         {% endif %}
                     </div>
@@ -109,6 +114,12 @@
                     <div class="priority-field">
                         <label for="due-date-{{ c.column.id }}" class="priority-label">📅 Vencimento</label>
                         <input type="date" name="due_date" id="due-date-{{ c.column.id }}" class="form-control" style="padding: 8px; border-radius: 6px;">
+                    </div>
+                    <div class="priority-field">
+                        <label for="assigned-to-{{ c.column.id }}" class="priority-label">👤 Atribuir a</label>
+                        <select name="assigned_to" id="assigned-to-{{ c.column.id }}" class="form-control priority-select">
+                            <option value="">Ninguém</option>
+                        </select>
                     </div>
                     <div class="priority-field">
                         <label for="priority-{{ c.column.id }}" class="priority-label">⚡ Prioridade</label>
@@ -200,6 +211,12 @@
                             </div>
                         </div>
                         <div class="priority-field">
+                            <label for="editAssignedTo" class="priority-label">👤 Atribuir a</label>
+                            <select name="assigned_to" id="editAssignedTo" class="form-control priority-select">
+                                <option value="">Ninguém</option>
+                            </select>
+                        </div>
+                        <div class="priority-field">
                             <label for="editPriority" class="priority-label">⚡ Prioridade</label>
                             <select name="priority" id="editPriority" class="form-control priority-select">
                                 <option value="low">🟢 Baixa</option>
@@ -261,7 +278,7 @@ function showToast(message, type) {
     } catch(e) { console.warn('toast fail', e); }
 }
 
-function openCardModal(cardId, title, description, boardId, columnClass, priority = 'medium', dueDate = '') {
+function openCardModal(cardId, title, description, boardId, columnClass, priority = 'medium', dueDate = '', assignedToId = '') {
     event.stopPropagation();
     currentCardId = cardId;
     currentBoardId = boardId;
@@ -323,6 +340,7 @@ function openCardModal(cardId, title, description, boardId, columnClass, priorit
     document.getElementById('editTitle').value = title;
     document.getElementById('editDescription').value = description;
     document.getElementById('editDueDate').value = dueDate;
+    document.getElementById('editAssignedTo').value = assignedToId;
     document.getElementById('editPriority').value = priority;
     document.getElementById('editForm').classList.remove('active');
     
@@ -972,6 +990,53 @@ function validateCardTitle(form) {
     }
     return true;
 }
+
+// Carregar lista de usuários para os selects
+function loadUsersIntoSelects() {
+    fetch('/api/users/')
+        .then(response => response.json())
+        .then(data => {
+            const users = data.users;
+            
+            // Preencher todos os selects de "assigned_to"
+            document.querySelectorAll('select[name="assigned_to"]').forEach(select => {
+                const currentValue = select.value;
+                // Preservar a opção "Ninguém"
+                const options = Array.from(select.options);
+                const ninguemOption = options.find(opt => opt.value === '');
+                
+                // Limpar e readicionar
+                select.innerHTML = '';
+                if (ninguemOption) {
+                    select.appendChild(ninguemOption.cloneNode(true));
+                } else {
+                    const option = document.createElement('option');
+                    option.value = '';
+                    option.textContent = 'Ninguém';
+                    select.appendChild(option);
+                }
+                
+                // Adicionar usuários
+                users.forEach(user => {
+                    const option = document.createElement('option');
+                    option.value = user.id;
+                    option.textContent = user.display_name;
+                    select.appendChild(option);
+                });
+                
+                // Restaurar valor anterior
+                select.value = currentValue;
+            });
+        })
+        .catch(error => {
+            console.error('Erro ao carregar usuários:', error);
+        });
+}
+
+// Carregar usuários quando a página carregar
+document.addEventListener('DOMContentLoaded', function() {
+    loadUsersIntoSelects();
+});
 </script>
 
 {% endblock %}

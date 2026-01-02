@@ -19,6 +19,8 @@
     <a href="{% url 'boards:list' %}" class="nav-link">Quadros</a>
     {% if user.is_authenticated %}
       <span style="color: #999;">|</span>
+      <a href="{% url 'boards:my_tasks' %}" class="nav-link">Minhas Tarefas</a>
+      <span style="color: #999;">|</span>
       <a href="{% url 'boards:profile' %}" class="nav-link">Perfil</a>
     {% endif %}
   </nav>
