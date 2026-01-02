@@ -2,7 +2,7 @@
 {% load static %}
 
 {% block content %}
-<div class="container" style="padding-top: 24px;">
+<div class="container">
     <!-- Cabeçalho -->
     <div class="board-header-card">
         <div class="board-header-content">
@@ -15,8 +15,8 @@
             </div>
             
             <div class="board-actions">
-                <a href="{% url 'boards:list' %}" class="btn btn-primary">
-                    ← Voltar aos Quadros
+                <a href="{% url 'boards:list' %}" class="btn btn-primary" style="text-decoration: none;">
+                    Voltar aos quadros
                 </a>
             </div>
         </div>
@@ -28,9 +28,9 @@
             <div style="margin-bottom: 32px;">
                 <h2 style="color: var(--primary); margin-bottom: 16px;">📌 {{ board_data.board.title }}</h2>
                 
-                <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px;">
+                <div class="my-tasks-grid">
                     {% for card in board_data.cards %}
-                        <div class="kanban-card" style="cursor: pointer; transition: all 0.2s ease;" 
+                        <div class="kanban-card my-tasks-card" style="cursor: pointer; transition: all 0.2s ease;" 
                              onclick="window.location.href='{% url 'boards:detail' board_data.board.id %}#card-{{ card.id }}'">
                             <div style="display: flex; justify-content: space-between; align-items: start; gap: 8px;">
                                 <div style="flex: 1;">
