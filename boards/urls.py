@@ -54,4 +54,7 @@ urlpatterns = [
     
     # Atividades
     path("card/<int:card_id>/activities/", views.get_card_activities, name="get_card_activities"),
+    
+    # API
+    path("api/users/", views.get_users_json, name="get_users"),
 ]
