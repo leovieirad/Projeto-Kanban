@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Board, Column, Card, Comment
+from .models import Board, Column, Card, Comment, Activity
 
 @admin.register(Board)
 class BoardAdmin(admin.ModelAdmin):
@@ -29,3 +29,20 @@ class CommentAdmin(admin.ModelAdmin):
     def text_preview(self, obj):
         return obj.text[:50] + '...' if len(obj.text) > 50 else obj.text
     text_preview.short_description = 'Comentário'
+
+@admin.register(Activity)
+class ActivityAdmin(admin.ModelAdmin):
+    list_display = ['card', 'user', 'get_action', 'timestamp']
+    list_filter = ['action', 'timestamp', 'user']
+    search_fields = ['card__title', 'user__username', 'description']
+    readonly_fields = ['card', 'user', 'action', 'description', 'timestamp']
+    
+    def get_action(self, obj):
+        return obj.get_action_display()
+    get_action.short_description = 'Ação'
+    
+    def has_add_permission(self, request):
+        return False
+    
+    def has_delete_permission(self, request, obj=None):
+        return False

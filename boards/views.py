@@ -9,10 +9,23 @@ from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.views.generic import ListView, DetailView
 from django.db.models import Q
-from .models import Board, Column, Card, Comment
+from .models import Board, Column, Card, Comment, Activity
 import json
 from django.db import transaction
 from django.views.decorators.http import require_http_methods
+
+
+# ========== FUNÇÕES HELPER PARA ATIVIDADES ==========
+
+def log_activity(card, user, action, description=""):
+    """Registra uma atividade no log."""
+    Activity.objects.create(
+        card=card,
+        user=user,
+        action=action,
+        description=description
+    )
+
 
 class BoardListView(ListView):
     model = Board
@@ -146,6 +159,13 @@ def toggle_card_done(request, card_pk):
     card = get_object_or_404(Card, pk=card_pk)
     card.is_done = not card.is_done
     card.save()
+    
+    # Registrar atividade
+    if card.is_done:
+        log_activity(card, request.user, 'completed', "Cartão marcado como concluído")
+    else:
+        log_activity(card, request.user, 'reopened', "Cartão reabrindo")
+    
     return JsonResponse({"is_done": card.is_done})
 
 def edit_card(request, card_id):
@@ -155,26 +175,72 @@ def edit_card(request, card_id):
     
     card = get_object_or_404(Card, id=card_id)
     if request.method == "POST":
-        card.title = request.POST.get("title")
-        card.description = request.POST.get("description")
-        card.priority = request.POST.get("priority", "medium")
-        due_date = request.POST.get("due_date", "").strip()
-        if due_date:
-            card.due_date = due_date
-        else:
-            card.due_date = None
+        # Rastrear mudanças
+        changes = []
         
+        # Verificar mudanças no título
+        new_title = request.POST.get("title")
+        if card.title != new_title:
+            changes.append(f"Título: '{card.title}' → '{new_title}'")
+            card.title = new_title
+        
+        # Verificar mudanças na descrição
+        new_desc = request.POST.get("description")
+        if card.description != new_desc:
+            changes.append("Descrição alterada")
+            card.description = new_desc
+        
+        # Verificar mudanças na prioridade
+        new_priority = request.POST.get("priority", "medium")
+        if card.priority != new_priority:
+            old_priority = dict(Card.PRIORITY_CHOICES).get(card.priority, card.priority)
+            new_priority_label = dict(Card.PRIORITY_CHOICES).get(new_priority, new_priority)
+            changes.append(f"Prioridade: {old_priority} → {new_priority_label}")
+            card.priority = new_priority
+        
+        # Verificar mudanças na data de vencimento
+        due_date = request.POST.get("due_date", "").strip()
+        new_due_date = due_date if due_date else None
+        if str(card.due_date) != str(new_due_date):
+            changes.append(f"Data de vencimento: {card.due_date} → {new_due_date}")
+            card.due_date = new_due_date
+        
+        # Verificar mudanças na atribuição
         assigned_to_id = request.POST.get("assigned_to", "").strip()
+        new_assigned_to = None
         if assigned_to_id:
             try:
-                card.assigned_to = User.objects.get(id=assigned_to_id)
+                new_assigned_to = User.objects.get(id=assigned_to_id)
             except User.DoesNotExist:
-                card.assigned_to = None
-        else:
-            card.assigned_to = None
+                new_assigned_to = None
+        
+        if card.assigned_to != new_assigned_to:
+            old_name = card.assigned_to.get_full_name() if card.assigned_to else "Ninguém"
+            new_name = new_assigned_to.get_full_name() if new_assigned_to else "Ninguém"
+            changes.append(f"Atribuído: {old_name} → {new_name}")
+            card.assigned_to = new_assigned_to
         
         card.save()
+        
+        # Registrar atividades das mudanças
+        if changes:
+            for change in changes:
+                if "Título" in change:
+                    log_activity(card, request.user, 'title_changed', change)
+                elif "Descrição" in change:
+                    log_activity(card, request.user, 'description_changed', change)
+                elif "Prioridade" in change:
+                    log_activity(card, request.user, 'priority_changed', change)
+                elif "Data de vencimento" in change:
+                    log_activity(card, request.user, 'due_date_changed', change)
+                elif "Atribuído" in change:
+                    if "Ninguém" in change.split(" → ")[1]:
+                        log_activity(card, request.user, 'unassigned', change)
+                    else:
+                        log_activity(card, request.user, 'assigned', change)
+        
         messages.success(request, "Cartão atualizado.")
+
     return redirect("boards:detail", pk=card.column.board.id)
 
 
@@ -198,7 +264,7 @@ def create_card(request, column_id):
                 except User.DoesNotExist:
                     assigned_to = None
             
-            Card.objects.create(
+            card = Card.objects.create(
                 column=column,
                 title=title,
                 description=request.POST.get("description", "").strip(),
@@ -206,6 +272,10 @@ def create_card(request, column_id):
                 due_date=due_date if due_date else None,
                 assigned_to=assigned_to
             )
+            
+            # Registrar atividade de criação
+            log_activity(card, request.user, 'created', f"Cartão criado no {column.title}")
+            
             messages.success(request, "Cartão criado.")
     return redirect("boards:detail", pk=column.board.id)
 
@@ -570,3 +640,23 @@ def my_tasks_view(request):
         'cards_by_board': cards_by_board,
         'total_tasks': cards.count()
     })
+
+@login_required
+def get_card_activities(request, card_id):
+    """Retorna o histórico de atividades de um cartão em JSON."""
+    card = get_object_or_404(Card, id=card_id)
+    activities = card.activities.all()[:50]  # Últimas 50 atividades
+    
+    activities_list = []
+    for activity in activities:
+        activities_list.append({
+            'id': activity.id,
+            'action': activity.get_action_display(),
+            'action_type': activity.action,
+            'user': activity.user.get_full_name() or activity.user.username,
+            'description': activity.description,
+            'timestamp': activity.timestamp.strftime('%d/%m/%Y %H:%M:%S'),
+            'timestamp_short': activity.timestamp.strftime('%d/%m %H:%M')
+        })
+    
+    return JsonResponse({'activities': activities_list})

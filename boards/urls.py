@@ -13,6 +13,7 @@ from .views import (
     logout_view,
     profile_view,
     change_password_view,
+    my_tasks_view,
 )
 
 app_name = "boards"
@@ -30,6 +31,7 @@ urlpatterns = [
     path("boards/novo/", create_board, name="create_board"),
     path("boards/<int:pk>/", BoardDetailView.as_view(), name="detail"),
     path("boards/<int:board_pk>/colunas/novo/", create_column, name="create_column"),
+    path("meu-tarefas/", my_tasks_view, name="my_tasks"),
     
     # ✔️ manter só esta rota de criar cartão
     path("colunas/<int:column_id>/cartoes/novo/", create_card, name="create_card"),
@@ -50,7 +52,6 @@ urlpatterns = [
     path("card/<int:card_id>/comments/add/", views.add_card_comment, name="add_card_comment"),
     path("comments/<int:comment_id>/delete/", views.delete_card_comment, name="delete_card_comment"),
     
-    # Tarefas atribuídas
-    path("minha-tasks/", views.my_tasks_view, name="my_tasks"),
-    path("api/users/", views.get_users_json, name="get_users"),
+    # Atividades
+    path("card/<int:card_id>/activities/", views.get_card_activities, name="get_card_activities"),
 ]

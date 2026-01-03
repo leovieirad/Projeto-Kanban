@@ -184,6 +184,16 @@
             
             <div class="card-modal-section">
                 <div class="card-modal-section-title">
+                    <span>📋</span>
+                    Histórico de Atividades
+                </div>
+                <div class="activities-container" id="activitiesContainer" style="max-height: 250px; overflow-y: auto;">
+                    <p style="color: #999; text-align: center;">Carregando...</p>
+                </div>
+            </div>
+            
+            <div class="card-modal-section">
+                <div class="card-modal-section-title">
                     <span>⚡</span>
                     Ações
                 </div>
@@ -346,8 +356,9 @@ function openCardModal(cardId, title, description, boardId, columnClass, priorit
     // Aplicar cor ao botão de salvar baseado na coluna onde o card está agora
     applyColumnColorToSaveButton(currentColumnClass);
     
-    // Carregar comentários
+    // Carregar comentários e atividades
     loadComments();
+    loadActivities();
     
     document.getElementById('cardModal').classList.add('active');
     document.body.style.overflow = 'hidden';
@@ -915,6 +926,48 @@ function loadComments() {
         .catch(error => {
             console.error('Erro ao carregar comentários:', error);
             showToast('Erro ao carregar comentários', 'error');
+        });
+}
+
+function loadActivities() {
+    if (!currentCardId) return;
+    
+    fetch(`/card/${currentCardId}/activities/`)
+        .then(response => response.json())
+        .then(data => {
+            const activitiesContainer = document.getElementById('activitiesContainer');
+            activitiesContainer.innerHTML = '';
+            
+            if (data.activities && data.activities.length > 0) {
+                const timeline = document.createElement('div');
+                timeline.className = 'activities-timeline';
+                timeline.style.borderLeft = '2px solid #ccc';
+                timeline.style.paddingLeft = '15px';
+                
+                data.activities.forEach(activity => {
+                    const activityDiv = document.createElement('div');
+                    activityDiv.style.marginBottom = '15px';
+                    activityDiv.innerHTML = `
+                        <div style="display: flex; justify-content: space-between; align-items: start;">
+                            <div>
+                                <strong>${activity.user}</strong>
+                                <span style="color: #666; font-size: 0.9em;"> ${activity.action}</span>
+                                <div style="color: #999; font-size: 0.85em; margin-top: 3px;">${activity.timestamp_short}</div>
+                            </div>
+                        </div>
+                        ${activity.description ? `<div style="color: #555; font-size: 0.9em; margin-top: 5px; padding: 5px; background: rgba(0,0,0,0.05); border-radius: 4px;">${activity.description}</div>` : ''}
+                    `;
+                    timeline.appendChild(activityDiv);
+                });
+                
+                activitiesContainer.appendChild(timeline);
+            } else {
+                activitiesContainer.innerHTML = '<p style="color: #999; text-align: center;">Nenhuma atividade registrada.</p>';
+            }
+        })
+        .catch(error => {
+            console.error('Erro ao carregar atividades:', error);
+            activitiesContainer.innerHTML = '<p style="color: #c33; text-align: center;">Erro ao carregar atividades</p>';
         });
 }
 
