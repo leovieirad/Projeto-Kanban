@@ -605,8 +605,9 @@ def delete_card_comment(request, comment_id):
 
 @login_required
 def get_users_json(request):
-    """Retorna lista de usuários em JSON para seleção de responsável."""
-    users = User.objects.filter(is_active=True).values('id', 'username', 'first_name', 'last_name').order_by('username')
+    """Retorna lista de usuários em JSON para seleção de responsável (sem admin)."""
+    # Excluir superusers/admins da lista
+    users = User.objects.filter(is_active=True, is_superuser=False).values('id', 'username', 'first_name', 'last_name').order_by('username')
     users_list = []
     for user in users:
         full_name = user['first_name'] or user['username']
