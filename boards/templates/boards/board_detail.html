@@ -682,6 +682,12 @@ document.addEventListener('DOMContentLoaded', function () {
         const list = this;
         list.classList.add('drop-target');
         
+        // Remover o texto "Nenhum cartão" se existir
+        const emptyMessage = list.querySelector('.card-empty');
+        if (emptyMessage) {
+            emptyMessage.remove();
+        }
+        
         // Encontrar o card mais próximo do mouse para inserir antes dele
         const afterElement = getDragAfterElement(list, e.clientY);
         
@@ -705,6 +711,22 @@ document.addEventListener('DOMContentLoaded', function () {
     function onDropList(e) {
         e.preventDefault();
         this.classList.remove('drop-target');
+        
+        // Verificar se alguma lista ficou vazia e adicionar o texto "Nenhum cartão"
+        document.querySelectorAll('.kanban-list').forEach(function(list) {
+            const cards = list.querySelectorAll('.kanban-card');
+            const emptyMessage = list.querySelector('.card-empty');
+            const addButton = list.querySelector('.btn.btn-primary.full-width');
+            
+            if (cards.length === 0 && !emptyMessage && addButton) {
+                // Criar e inserir o texto "Nenhum cartão" antes do botão
+                const emptyDiv = document.createElement('div');
+                emptyDiv.className = 'card-empty';
+                emptyDiv.innerHTML = '<i>Nenhum cartão.</i>';
+                list.insertBefore(emptyDiv, addButton);
+            }
+        });
+        
         saveBoardOrder();
     }
     
