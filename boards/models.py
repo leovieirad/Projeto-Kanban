@@ -8,9 +8,42 @@ class Board(models.Model):
     title = models.CharField(max_length=200)
     description = models.TextField(blank=True)
     created_at = models.DateTimeField(default=timezone.now)
+    owner = models.ForeignKey(
+        User,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="owned_boards",
+    )
 
     def __str__(self):
         return self.title
+
+    # Helpers de permissão
+    def get_member(self, user):
+        if not user or not user.is_authenticated:
+            return None
+        return self.members.filter(user=user).first()
+
+    def user_can_view(self, user):
+        if not user or not user.is_authenticated:
+            return False
+        if self.owner_id is None:
+            return True  # compatibilidade para quadros antigos
+        if self.owner_id == user.id:
+            return True
+        member = self.get_member(user)
+        return member is not None
+
+    def user_can_edit(self, user):
+        if not user or not user.is_authenticated:
+            return False
+        if self.owner_id is None:
+            return True
+        if self.owner_id == user.id:
+            return True
+        member = self.get_member(user)
+        return bool(member and member.role == BoardMember.ROLE_EDITOR)
 
 
 class Column(models.Model):
@@ -110,3 +143,27 @@ class Activity(models.Model):
 
     def __str__(self):
         return f"{self.user.username} - {self.get_action_display()} em {self.card.title}"
+
+
+class BoardMember(models.Model):
+    """Participantes de um quadro com papel de editor ou visualizador."""
+
+    ROLE_VIEWER = "viewer"
+    ROLE_EDITOR = "editor"
+    ROLE_CHOICES = [
+        (ROLE_VIEWER, "Visualizador"),
+        (ROLE_EDITOR, "Editor"),
+    ]
+
+    board = models.ForeignKey(Board, related_name="members", on_delete=models.CASCADE)
+    user = models.ForeignKey(User, related_name="board_memberships", on_delete=models.CASCADE)
+    role = models.CharField(max_length=10, choices=ROLE_CHOICES, default=ROLE_EDITOR)
+    added_at = models.DateTimeField(default=timezone.now)
+
+    class Meta:
+        unique_together = ("board", "user")
+        verbose_name = "Membro do Quadro"
+        verbose_name_plural = "Membros do Quadro"
+
+    def __str__(self):
+        return f"{self.user.username} em {self.board.title} ({self.get_role_display()})"

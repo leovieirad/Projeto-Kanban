@@ -1,0 +1,105 @@
+{% extends "boards/base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container" style="margin-top: 20px; max-width: 700px;">
+    <div style="margin-bottom: 30px;">
+        <h2 style="margin-bottom: 8px;">🔗 Compartilhar quadro: {{ board.title }}</h2>
+        <p class="text-muted">Selecione um usuário e defina o nível de acesso.</p>
+    </div>
+
+    <!-- Card de convite -->
+    <div class="card" style="padding: 20px; margin-bottom: 24px; border-radius: 10px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);">
+        <form method="post" action="{% url 'boards:invite_member' board.id %}">
+            {% csrf_token %}
+            
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label class="form-label" style="font-weight: 600; margin-bottom: 8px;">👤 Selecionar usuário</label>
+                    <select name="identifier" class="form-control" required style="padding: 10px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.2); background: rgba(0,0,0,0.3); color: inherit;">
+                        <option value="">-- Escolha um usuário --</option>
+                        {% for user in available_users %}
+                        <option value="{{ user.username }}">
+                            {{ user.get_full_name|default:user.username }} ({{ user.username }})
+                        </option>
+                        {% empty %}
+                        <option disabled>Nenhum usuário disponível</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label" style="font-weight: 600; margin-bottom: 8px;">🔐 Permissão</label>
+                    <select name="role" class="form-control" style="padding: 10px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.2); background: rgba(0,0,0,0.3); color: inherit;">
+                        {% for value,label in roles %}
+                        <option value="{{ value }}">{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+
+            <div style="margin-top: 16px; display: flex; justify-content: flex-end;">
+                <button type="submit" class="btn btn-primary" style="padding: 10px 24px; border-radius: 6px; font-weight: 600;">
+                    Convidar
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Legenda de permissões -->
+    <div style="background: rgba(0,0,0,0.2); padding: 16px; border-radius: 8px; margin-bottom: 24px; font-size: 0.9em;">
+        <p style="margin: 0 0 8px 0;"><strong>📖 Visualizador:</strong> Pode visualizar o quadro e seus cartões, mas não pode editar.</p>
+        <p style="margin: 0;"><strong>✏️ Editor:</strong> Pode visualizar, criar, editar e deletar cartões e colunas.</p>
+    </div>
+
+    <!-- Lista de membros -->
+    <div>
+        <h4 style="margin-bottom: 16px; font-weight: 600;">👥 Membros Atuais</h4>
+        <div class="card" style="border-radius: 10px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1);">
+            {% if board.owner %}
+            <div style="padding: 16px; border-bottom: 1px solid rgba(255,255,255,0.1); display: flex; justify-content: space-between; align-items: center; background: rgba(100,200,255,0.1);">
+                <div>
+                    <div style="font-weight: 600;">👑 {{ board.owner.get_full_name|default:board.owner.username }}</div>
+                    <div style="font-size: 0.85em; color: #aaa;">Proprietário do quadro</div>
+                </div>
+                <div style="color: #4a9eff; font-weight: 600;">Admin</div>
+            </div>
+            {% endif %}
+
+            {% for member in members %}
+            <div style="padding: 16px; border-bottom: 1px solid rgba(255,255,255,0.1); display: flex; justify-content: space-between; align-items: center; gap: 16px;">
+                <div style="flex: 1;">
+                    <div style="font-weight: 500;">{{ member.user.get_full_name|default:member.user.username }}</div>
+                    <div style="font-size: 0.85em; color: #aaa;">@{{ member.user.username }}</div>
+                </div>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <form method="post" action="{% url 'boards:update_member_role' board.id member.id %}" style="display: flex; align-items: center; gap: 8px; margin: 0;">
+                        {% csrf_token %}
+                        <select name="role" class="form-control form-control-sm" style="padding: 6px 8px; font-size: 0.9em; border-radius: 4px; border: 1px solid rgba(255,255,255,0.2); background: rgba(0,0,0,0.3);">
+                            {% for value,label in roles %}
+                            <option value="{{ value }}" {% if member.role == value %}selected{% endif %}>{{ label }}</option>
+                            {% endfor %}
+                        </select>
+                        <button type="submit" class="btn btn-sm btn-secondary" style="padding: 6px 12px; font-size: 0.9em; white-space: nowrap;">Salvar</button>
+                    </form>
+                    <form method="post" action="{% url 'boards:remove_member' board.id member.id %}" onsubmit="return confirm('Remover este colaborador?');" style="margin: 0;">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-sm btn-danger" style="padding: 6px 12px; font-size: 0.9em; white-space: nowrap;">Remover</button>
+                    </form>
+                </div>
+            </div>
+            {% empty %}
+            <div style="padding: 32px; text-align: center; color: #888;">
+                <p style="margin: 0;">Nenhum colaborador convidado ainda.</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div style="margin-top: 24px;">
+        <a href="{% url 'boards:detail' board.id %}" class="btn btn-link" style="color: #4a9eff; text-decoration: none; font-weight: 500;">
+            ← Voltar para o quadro
+        </a>
+    </div>
+</div>
+{% endblock %}

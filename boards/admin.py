@@ -1,9 +1,10 @@
 from django.contrib import admin
-from .models import Board, Column, Card, Comment, Activity
+from .models import Board, Column, Card, Comment, Activity, BoardMember
 
 @admin.register(Board)
 class BoardAdmin(admin.ModelAdmin):
-    list_display = ['title', 'created_at']
+    list_display = ['title', 'owner', 'created_at']
+    list_filter = ['owner']
     search_fields = ['title', 'description']
 
 @admin.register(Column)
@@ -46,3 +47,10 @@ class ActivityAdmin(admin.ModelAdmin):
     
     def has_delete_permission(self, request, obj=None):
         return False
+
+
+@admin.register(BoardMember)
+class BoardMemberAdmin(admin.ModelAdmin):
+    list_display = ['board', 'user', 'role']
+    list_filter = ['role', 'board']
+    search_fields = ['board__title', 'user__username', 'user__email']

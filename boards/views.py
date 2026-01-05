@@ -9,7 +9,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.views.generic import ListView, DetailView
 from django.db.models import Q
-from .models import Board, Column, Card, Comment, Activity
+from .models import Board, Column, Card, Comment, Activity, BoardMember
 import json
 from django.db import transaction
 from django.views.decorators.http import require_http_methods
@@ -38,7 +38,11 @@ class BoardListView(ListView):
         return super().dispatch(request, *args, **kwargs)
     
     def get_queryset(self):
-        qs = super().get_queryset()
+        qs = Board.objects.filter(
+            Q(owner=self.request.user)
+            | Q(members__user=self.request.user)
+            | Q(owner__isnull=True)
+        ).distinct()
         q = self.request.GET.get('q', '').strip()
         if q:
             qs = qs.filter(Q(title__icontains=q) | Q(description__icontains=q))
@@ -52,6 +56,10 @@ class BoardDetailView(DetailView):
     def dispatch(self, request, *args, **kwargs):
         if not request.user.is_authenticated:
             return redirect("boards:login")
+        board = self.get_object()
+        if not board.user_can_view(request.user):
+            messages.error(request, "Você não tem acesso a este quadro.")
+            return redirect("boards:list")
         return super().dispatch(request, *args, **kwargs)
     
     def get_context_data(self, **kwargs):
@@ -98,6 +106,9 @@ class BoardDetailView(DetailView):
             })
 
         ctx['kanban_columns'] = kanban_columns
+        ctx['can_edit_board'] = board.user_can_edit(self.request.user)
+        ctx['is_owner'] = board.owner_id == self.request.user.id if self.request.user.is_authenticated else False
+        ctx['member_role'] = board.get_member(self.request.user).role if board.get_member(self.request.user) else None
         return ctx
 
 def create_board(request):
@@ -109,7 +120,7 @@ def create_board(request):
         title = request.POST.get("title", "").strip()
         description = request.POST.get("description", "").strip()
         if title:
-            board = Board.objects.create(title=title, description=description)
+            board = Board.objects.create(title=title, description=description, owner=request.user)
             # Criar colunas padrão para padronizar novos quadros (A Fazer, Fazendo, Feito)
             default_columns = ["A Fazer", "Em Progresso", "Feito"]
             for idx, col_title in enumerate(default_columns):
@@ -124,6 +135,9 @@ def create_column(request, board_pk):
         return redirect("boards:login")
     
     board = get_object_or_404(Board, pk=board_pk)
+    if not board.user_can_edit(request.user):
+        messages.error(request, "Sem permissão para editar este quadro.")
+        return redirect("boards:detail", pk=board_pk)
     if request.method == "POST":
         title = request.POST.get("title", "").strip()
         if title:
@@ -141,6 +155,9 @@ def update_board(request, pk):
         return redirect("boards:login")
     
     board = get_object_or_404(Board, pk=pk)
+    if not board.user_can_edit(request.user):
+        messages.error(request, "Sem permissão para editar este quadro.")
+        return redirect("boards:detail", pk=pk)
     if request.method == "POST":
         board.title = request.POST.get("title")
         board.description = request.POST.get("description")
@@ -157,6 +174,8 @@ def toggle_card_done(request, card_pk):
         return redirect("boards:login")
     
     card = get_object_or_404(Card, pk=card_pk)
+    if not card.column.board.user_can_edit(request.user):
+        return JsonResponse({"ok": False, "error": "forbidden"}, status=403)
     card.is_done = not card.is_done
     card.save()
     
@@ -174,6 +193,9 @@ def edit_card(request, card_id):
         return redirect("boards:login")
     
     card = get_object_or_404(Card, id=card_id)
+    if not card.column.board.user_can_edit(request.user):
+        messages.error(request, "Sem permissão para editar este cartão.")
+        return redirect("boards:detail", pk=card.column.board.id)
     if request.method == "POST":
         # Rastrear mudanças
         changes = []
@@ -250,6 +272,9 @@ def create_card(request, column_id):
         return redirect("boards:login")
     
     column = get_object_or_404(Column, id=column_id)
+    if not column.board.user_can_edit(request.user):
+        messages.error(request, "Sem permissão para adicionar cartões neste quadro.")
+        return redirect("boards:detail", pk=column.board.id)
     if request.method == "POST":
         title = request.POST.get("title", "").strip()
         if not title:
@@ -287,6 +312,8 @@ def delete_card(request, card_pk):
         return redirect("boards:login")
     
     card = get_object_or_404(Card, pk=card_pk)
+    if not card.column.board.user_can_edit(request.user):
+        return JsonResponse({"ok": False, "error": "forbidden"}, status=403)
     board_id = card.column.board.id
     card.delete()
     messages.success(request, "Cartão excluído.")
@@ -305,6 +332,8 @@ def delete_column(request, column_pk):
         return JsonResponse({"ok": False, "error": "unauthorized"}, status=401)
     
     column = get_object_or_404(Column, pk=column_pk)
+    if not column.board.user_can_edit(request.user):
+        return JsonResponse({"ok": False, "error": "forbidden"}, status=403)
     board_id = column.board.id
     board = column.board
     
@@ -328,6 +357,8 @@ def rename_column(request, column_pk):
         return JsonResponse({"ok": False, "error": "unauthorized"}, status=401)
 
     column = get_object_or_404(Column, pk=column_pk)
+    if not column.board.user_can_edit(request.user):
+        return JsonResponse({"ok": False, "error": "forbidden"}, status=403)
     title = (request.POST.get("title") or "").strip()
     if not title:
         return JsonResponse({"ok": False, "error": "empty_title"}, status=400)
@@ -349,6 +380,9 @@ def delete_board(request, pk):
         return redirect("boards:login")
     
     board = get_object_or_404(Board, pk=pk)
+    if board.owner_id and board.owner_id != request.user.id:
+        messages.error(request, "Somente o dono do quadro pode excluí-lo.")
+        return redirect("boards:detail", pk=pk)
     board.delete()
     messages.success(request, "Quadro excluído.")
     return redirect("boards:list")
@@ -378,10 +412,15 @@ def reorder_cards(request):
         for col in columns:
             col_id = col.get("id")
             cards = col.get("cards") or []
+            try:
+                column = Column.objects.select_related("board").get(id=col_id)
+            except Column.DoesNotExist:
+                continue
+            if not column.board.user_can_edit(request.user):
+                return JsonResponse({"ok": False, "error": "forbidden"}, status=403)
             for pos, card_id in enumerate(cards):
                 try:
                     card = Card.objects.select_for_update().get(id=card_id)
-                    # atualiza coluna se necessário
                     if card.column_id != col_id:
                         card.column_id = col_id
                     card.position = pos
@@ -415,13 +454,109 @@ def reorder_columns(request):
     with transaction.atomic():
         for pos, col_id in enumerate(columns_order):
             try:
-                column = Column.objects.select_for_update().get(id=col_id)
+                column = Column.objects.select_related("board").select_for_update().get(id=col_id)
+                if not column.board.user_can_edit(request.user):
+                    return JsonResponse({"ok": False, "error": "forbidden"}, status=403)
                 column.position = pos
                 column.save()
             except Column.DoesNotExist:
                 continue
 
     return JsonResponse({"ok": True})
+
+
+# ============== COMPARTILHAMENTO DE QUADROS ==============
+
+@login_required
+def share_board(request, pk):
+    board = get_object_or_404(Board, pk=pk)
+    if not board.user_can_edit(request.user):
+        messages.error(request, "Sem permissão para compartilhar este quadro.")
+        return redirect("boards:detail", pk=pk)
+
+    members = board.members.select_related("user").all()
+    # Mostrar apenas usuários que não são owners/membros já
+    member_ids = board.members.values_list('user_id', flat=True)
+    available_users = User.objects.filter(
+        is_active=True, 
+        is_superuser=False
+    ).exclude(
+        Q(id=board.owner_id) | Q(id__in=member_ids)
+    ).order_by('username')
+
+    return render(
+        request,
+        "boards/board_share.html",
+        {
+            "board": board,
+            "members": members,
+            "available_users": available_users,
+            "roles": BoardMember.ROLE_CHOICES,
+        },
+    )
+
+
+@login_required
+@require_POST
+def invite_member(request, pk):
+    board = get_object_or_404(Board, pk=pk)
+    if not board.user_can_edit(request.user):
+        messages.error(request, "Sem permissão para compartilhar este quadro.")
+        return redirect("boards:detail", pk=pk)
+
+    identifier = (request.POST.get("identifier") or "").strip()
+    role = request.POST.get("role", BoardMember.ROLE_VIEWER)
+
+    target_user = User.objects.filter(Q(username__iexact=identifier) | Q(email__iexact=identifier)).first()
+    if not target_user:
+        messages.error(request, "Usuário não encontrado.")
+        return redirect("boards:share_board", pk=pk)
+
+    if board.owner_id == target_user.id:
+        messages.info(request, "Esse usuário já é o dono do quadro.")
+        return redirect("boards:share_board", pk=pk)
+
+    BoardMember.objects.update_or_create(
+        board=board,
+        user=target_user,
+        defaults={"role": role},
+    )
+    messages.success(request, "Permissão concedida com sucesso.")
+    return redirect("boards:share_board", pk=pk)
+
+
+@login_required
+@require_POST
+def update_member_role(request, pk, member_id):
+    board = get_object_or_404(Board, pk=pk)
+    if not board.user_can_edit(request.user):
+        messages.error(request, "Sem permissão para alterar permissões deste quadro.")
+        return redirect("boards:detail", pk=pk)
+
+    member = get_object_or_404(BoardMember, id=member_id, board=board)
+    role = request.POST.get("role", BoardMember.ROLE_VIEWER)
+    member.role = role
+    member.save()
+    messages.success(request, "Permissão atualizada.")
+    return redirect("boards:share_board", pk=pk)
+
+
+@login_required
+@require_POST
+def remove_member(request, pk, member_id):
+    board = get_object_or_404(Board, pk=pk)
+    if not board.user_can_edit(request.user):
+        messages.error(request, "Sem permissão para alterar permissões deste quadro.")
+        return redirect("boards:detail", pk=pk)
+
+    member = get_object_or_404(BoardMember, id=member_id, board=board)
+    if member.user_id == board.owner_id:
+        messages.error(request, "Não é possível remover o dono do quadro.")
+        return redirect("boards:share_board", pk=pk)
+
+    member.delete()
+    messages.success(request, "Colaborador removido.")
+    return redirect("boards:share_board", pk=pk)
 
 
 # ============== VIEWS DE AUTENTICAÇÃO ==============
@@ -550,6 +685,8 @@ def change_password_view(request):
 def get_card_comments(request, card_id):
     """Retorna comentários de um card em formato JSON."""
     card = get_object_or_404(Card, id=card_id)
+    if not card.column.board.user_can_view(request.user):
+        return JsonResponse({'ok': False, 'error': 'forbidden'}, status=403)
     comments = card.comments.select_related('user').all()
     
     comments_data = [{
@@ -567,6 +704,8 @@ def get_card_comments(request, card_id):
 def add_card_comment(request, card_id):
     """Adiciona um novo comentário a um card."""
     card = get_object_or_404(Card, id=card_id)
+    if not card.column.board.user_can_view(request.user):
+        return JsonResponse({'ok': False, 'error': 'forbidden'}, status=403)
     text = request.POST.get('text', '').strip()
     
     if not text:
@@ -594,6 +733,8 @@ def add_card_comment(request, card_id):
 def delete_card_comment(request, comment_id):
     """Deleta um comentário (apenas o autor pode deletar)."""
     comment = get_object_or_404(Comment, id=comment_id)
+    if not comment.card.column.board.user_can_edit(request.user):
+        return JsonResponse({'ok': False, 'error': 'forbidden'}, status=403)
     
     # Apenas o autor do comentário pode deletá-lo
     if comment.user != request.user:
@@ -624,7 +765,13 @@ def get_users_json(request):
 @login_required
 def my_tasks_view(request):
     """Lista todas as tarefas atribuídas ao usuário atual."""
-    cards = Card.objects.filter(assigned_to=request.user).select_related('column', 'column__board').order_by('-created_at')
+    accessible_boards = Board.objects.filter(
+        Q(owner=request.user) | Q(members__user=request.user) | Q(owner__isnull=True)
+    ).values_list('id', flat=True)
+    cards = Card.objects.filter(
+        assigned_to=request.user,
+        column__board_id__in=accessible_boards
+    ).select_related('column', 'column__board').order_by('-created_at')
     
     # Agrupar por quadro
     cards_by_board = {}
@@ -646,6 +793,8 @@ def my_tasks_view(request):
 def get_card_activities(request, card_id):
     """Retorna o histórico de atividades de um cartão em JSON."""
     card = get_object_or_404(Card, id=card_id)
+    if not card.column.board.user_can_view(request.user):
+        return JsonResponse({'ok': False, 'error': 'forbidden'}, status=403)
     activities = card.activities.all()[:50]  # Últimas 50 atividades
     
     activities_list = []

@@ -14,6 +14,10 @@ from .views import (
     profile_view,
     change_password_view,
     my_tasks_view,
+    share_board,
+    invite_member,
+    update_member_role,
+    remove_member,
 )
 
 app_name = "boards"
@@ -30,6 +34,10 @@ urlpatterns = [
     path("", BoardListView.as_view(), name="list"),
     path("boards/novo/", create_board, name="create_board"),
     path("boards/<int:pk>/", BoardDetailView.as_view(), name="detail"),
+    path("boards/<int:pk>/share/", share_board, name="share_board"),
+    path("boards/<int:pk>/share/invite/", invite_member, name="invite_member"),
+    path("boards/<int:pk>/share/<int:member_id>/update/", update_member_role, name="update_member_role"),
+    path("boards/<int:pk>/share/<int:member_id>/remove/", remove_member, name="remove_member"),
     path("boards/<int:board_pk>/colunas/novo/", create_column, name="create_column"),
     path("meu-tarefas/", my_tasks_view, name="my_tasks"),
     

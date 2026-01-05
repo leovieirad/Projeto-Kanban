@@ -18,6 +18,11 @@
                 <button id="btn-edit-board" class="btn btn-primary" title="Editar quadro">
                     Editar quadro
                 </button>
+                {% if can_edit_board %}
+                <a href="{% url 'boards:share_board' board.id %}" class="btn btn-secondary" title="Compartilhar quadro" style="text-decoration:none;">
+                    Compartilhar
+                </a>
+                {% endif %}
                 <button id="btn-add-new-column" class="btn btn-success" title="Adicionar nova coluna">
                     Nova coluna
                 </button>
