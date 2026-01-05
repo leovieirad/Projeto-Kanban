@@ -28,8 +28,9 @@ class Board(models.Model):
     def user_can_view(self, user):
         if not user or not user.is_authenticated:
             return False
+        # Quadros sem owner (criados antes da feature) são visíveis para todos usuários autenticados
         if self.owner_id is None:
-            return True  # compatibilidade para quadros antigos
+            return True
         if self.owner_id == user.id:
             return True
         member = self.get_member(user)
@@ -38,6 +39,7 @@ class Board(models.Model):
     def user_can_edit(self, user):
         if not user or not user.is_authenticated:
             return False
+        # Quadros sem owner (criados antes da feature) são editáveis para todos usuários autenticados
         if self.owner_id is None:
             return True
         if self.owner_id == user.id:

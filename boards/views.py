@@ -39,9 +39,7 @@ class BoardListView(ListView):
     
     def get_queryset(self):
         qs = Board.objects.filter(
-            Q(owner=self.request.user)
-            | Q(members__user=self.request.user)
-            | Q(owner__isnull=True)
+            Q(owner=self.request.user) | Q(members__user=self.request.user)
         ).distinct()
         q = self.request.GET.get('q', '').strip()
         if q:
