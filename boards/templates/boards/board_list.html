@@ -22,7 +22,7 @@
                         {% endif %}
                         <div class="board-meta">{{ board.created_at|date:"d/m/Y" }}</div>
                         <div class="board-actions" style="display:flex;gap:8px;margin-top:12px;">
-                            <a class="btn-secondary btn-open" href="{% url 'boards:detail' board.pk %}">Abrir quadro</a>
+                            <a class="btn-open-board" href="{% url 'boards:detail' board.pk %}">Abrir quadro</a>
                             <form method="post" action="{% url 'boards:delete_board' board.pk %}" onsubmit="return confirm('Deseja realmente excluir este quadro?');">
                                 {% csrf_token %}
                                 <button type="submit" class="btn btn-danger btn-open">Excluir quadro</button>
