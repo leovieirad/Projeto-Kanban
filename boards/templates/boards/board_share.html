@@ -80,7 +80,7 @@
                             <option value="{{ value }}" {% if member.role == value %}selected{% endif %}>{{ label }}</option>
                             {% endfor %}
                         </select>
-                        <button type="submit" class="btn btn-sm btn-secondary" style="padding: 6px 12px; font-size: 0.9em; white-space: nowrap;">Salvar</button>
+                        <button type="submit" class="btn btn-sm btn-primary btn-save-compact" style="white-space: nowrap;">Salvar</button>
                     </form>
                     <form method="post" action="{% url 'boards:remove_member' board.id member.id %}" onsubmit="return confirm('Remover este colaborador?');" style="margin: 0;">
                         {% csrf_token %}

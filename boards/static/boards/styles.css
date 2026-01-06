@@ -465,6 +465,34 @@ body.dark-mode #edit-board-form .form-control:hover {
   margin-bottom: 20px;
 }
 
+/* Melhorar visibilidade de selects e inputs em geral */
+.form-control {
+  color: inherit;
+}
+
+select.form-control,
+select.form-control-sm {
+  color: #fff !important;
+}
+
+select.form-control option,
+select.form-control-sm option {
+  background: #2b2d31;
+  color: #fff;
+}
+
+body.light-mode select.form-control,
+body.light-mode select.form-control-sm {
+  color: #1f2937 !important;
+}
+
+body.light-mode select.form-control option,
+body.light-mode select.form-control-sm option {
+  background: #fff;
+  color: #1f2937;
+}
+}
+
 #edit-board-form .btn-success {
   margin-top: 8px;
   padding: 10px 24px;
@@ -545,6 +573,19 @@ body.dark-mode .btn-link { color: var(--primary); }
 
 /* Variante de botão pequeno usada nos templates */
 .btn-sm { padding: 6px 10px; font-size: 14px; border-radius: 6px; }
+
+/* Botão Salvar com padding e min-width reduzidos */
+form[action*="update_member_role"] .btn-primary.btn-sm {
+  padding: 6px 8px !important;
+  min-width: auto !important;
+}
+
+/* Classe específica para botão Salvar compacto */
+.btn-save-compact {
+  padding: 6px 18px !important;
+  min-width: auto !important;
+  font-size: 0.9em !important;
+}
 
 /* Aparência para botões grandes azuis (ex: adicionar) */
 .btn-primary.full-width { display:block; text-align:center; width:100%; }
