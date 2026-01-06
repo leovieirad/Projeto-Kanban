@@ -19,7 +19,7 @@
                     Editar quadro
                 </button>
                 {% if can_edit_board %}
-                <a href="{% url 'boards:share_board' board.id %}" class="btn btn-secondary" title="Compartilhar quadro" style="text-decoration:none;">
+                <a href="{% url 'boards:share_board' board.id %}" class="btn btn-share" title="Compartilhar quadro">
                     Compartilhar
                 </a>
                 {% endif %}
