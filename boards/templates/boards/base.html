@@ -66,6 +66,33 @@
 
 {% block content %}{% endblock %}
 
+<!-- Footer -->
+<footer class="app-footer">
+  <div class="footer-content">
+    <div class="footer-section">
+      <h4>Sobre</h4>
+      <p>Boardly é uma ferramenta de gerenciamento de projetos Kanban moderna e intuitiva.</p>
+    </div>
+    <div class="footer-section">
+      <h4>Links</h4>
+      <ul>
+        <li><a href="{% url 'boards:list' %}">Meus Quadros</a></li>
+        <li><a href="{% url 'boards:my_tasks' %}">Minhas Tarefas</a></li>
+        <li><a href="{% url 'boards:profile' %}">Perfil</a></li>
+      </ul>
+    </div>
+    <div class="footer-section">
+      <h4>Contato</h4>
+      <ul>
+        <li><a href="mailto:support@boardly.com">support@boardly.com</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>&copy; 2026 Boardly. Todos os direitos reservados.</p>
+  </div>
+</footer>
+
 <script src="{% static 'boards/theme.js' %}"></script>
 
 <!-- Desaparecer notificações -->
