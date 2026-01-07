@@ -77,7 +77,7 @@ A interface do sistema Kanban é inspirada em ferramentas modernas de produtivid
 
 1. **Clone o repositório:**
    ```bash
-   git clone <seu-repositorio-url>
+   git clone <https://github.com/leovieirad/Projeto-Kanban.git>
    cd Projeto-Kanban
    ```
 
@@ -132,7 +132,7 @@ A interface do sistema Kanban é inspirada em ferramentas modernas de produtivid
 
 1. **Clone the repository:**
    ```bash
-   git clone <your-repository-url>
+   git clone <https://github.com/leovieirad/Projeto-Kanban.git>
    cd Projeto-Kanban
    ```
 
