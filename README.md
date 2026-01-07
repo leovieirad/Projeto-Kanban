@@ -62,3 +62,114 @@ Esse é um projeto de **Quadro Kanban Online** desenvolvido utilizando: **Python
 A interface do sistema Kanban é inspirada em ferramentas modernas de produtividade. Cada quadro pode ser personalizado conforme o estilo de trabalho do usuário, permitindo controle visual claro das tarefas.
 
 > The Kanban system interface is inspired by modern productivity tools. Each board can be customized to fit the user’s workflow, allowing a clear visual control of tasks.
+---
+
+## 📥 Como Baixar e Executar o Projeto (How to Download and Run the Project)
+
+### 🇧🇷 Português
+
+#### Pré-requisitos
+- **Python 3.8+** instalado no seu computador
+- **Git** instalado (para clonar o repositório)
+- **pip** (gerenciador de pacotes Python)
+
+#### Passos para executar:
+
+1. **Clone o repositório:**
+   ```bash
+   git clone <seu-repositorio-url>
+   cd Projeto-Kanban
+   ```
+
+2. **Crie um ambiente virtual:**
+   ```bash
+   python -m venv venv
+   ```
+
+3. **Ative o ambiente virtual:**
+   - **Windows:**
+     ```bash
+     venv\Scripts\activate
+     ```
+   - **macOS/Linux:**
+     ```bash
+     source venv/bin/activate
+     ```
+
+4. **Instale as dependências:**
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+5. **Execute as migrações do banco de dados:**
+   ```bash
+   python manage.py migrate
+   ```
+
+6. **Crie um superusuário (admin):**
+   ```bash
+   python manage.py createsuperuser
+   ```
+
+7. **Inicie o servidor:**
+   ```bash
+   python manage.py runserver
+   ```
+
+8. **Acesse a aplicação:**
+   Abra seu navegador e vá para `http://127.0.0.1:8000/`
+
+---
+
+### 🇬🇧 English
+
+#### Prerequisites
+- **Python 3.8+** installed on your computer
+- **Git** installed (to clone the repository)
+- **pip** (Python package manager)
+
+#### Steps to run:
+
+1. **Clone the repository:**
+   ```bash
+   git clone <your-repository-url>
+   cd Projeto-Kanban
+   ```
+
+2. **Create a virtual environment:**
+   ```bash
+   python -m venv venv
+   ```
+
+3. **Activate the virtual environment:**
+   - **Windows:**
+     ```bash
+     venv\Scripts\activate
+     ```
+   - **macOS/Linux:**
+     ```bash
+     source venv/bin/activate
+     ```
+
+4. **Install dependencies:**
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+5. **Run database migrations:**
+   ```bash
+   python manage.py migrate
+   ```
+
+6. **Create a superuser (admin):**
+   ```bash
+   python manage.py createsuperuser
+   ```
+
+7. **Start the development server:**
+   ```bash
+   python manage.py runserver
+   ```
+
+8. **Access the application:**
+   Open your browser and go to `http://127.0.0.1:8000/`
