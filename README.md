@@ -66,7 +66,7 @@ A interface do sistema Kanban é inspirada em ferramentas modernas de produtivid
 
 ## 📥 Como Baixar e Executar o Projeto (How to Download and Run the Project)
 
-### 🇧🇷 Português
+### Português
 
 #### Pré-requisitos
 - **Python 3.8+** instalado no seu computador
@@ -121,7 +121,7 @@ A interface do sistema Kanban é inspirada em ferramentas modernas de produtivid
 
 ---
 
-### 🇬🇧 English
+### English
 
 #### Prerequisites
 - **Python 3.8+** installed on your computer
