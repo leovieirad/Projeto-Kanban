@@ -679,6 +679,115 @@ def change_password_view(request):
     return redirect("boards:profile")
 
 
+def password_reset_view(request):
+    """Solicita recuperação de senha."""
+    if request.user.is_authenticated:
+        return redirect("boards:list")
+    
+    if request.method == "POST":
+        username_email = request.POST.get("username_email", "").strip()
+        
+        # Buscar usuário por nome de usuário ou email
+        user = None
+        if username_email:
+            user = User.objects.filter(
+                Q(username__iexact=username_email) | Q(email__iexact=username_email)
+            ).first()
+        
+        if user:
+            # Gerar token e enviar email
+            from django.contrib.auth.tokens import default_token_generator
+            from django.core.mail import send_mail
+            from django.urls import reverse
+            from django.contrib.sites.shortcuts import get_current_site
+            
+            token = default_token_generator.make_token(user)
+            uid = user.pk
+            
+            # Construir URL de reset
+            reset_url = request.build_absolute_uri(
+                reverse('boards:password_reset_confirm', kwargs={'uidb36': uid, 'token': token})
+            )
+            
+            # Enviar email com instruções
+            subject = "Recuperação de Senha - Boardly"
+            message = f"""
+Olá {user.first_name or user.username},
+
+Recebemos uma solicitação para recuperar sua senha. Clique no link abaixo para criar uma nova senha:
+
+{reset_url}
+
+Este link expira em 24 horas.
+
+Se você não solicitou essa recuperação, ignore este email.
+
+Atenciosamente,
+Equipe Boardly
+            """
+            
+            try:
+                send_mail(subject, message, 'noreply@boardly.com', [user.email], fail_silently=False)
+                messages.success(request, "Se o usuário existir, receberá um email com instruções de recuperação.")
+            except Exception as e:
+                # Em caso de erro ao enviar email, continuar mostrando mensagem de sucesso por segurança
+                print(f"Erro ao enviar email: {e}")
+                messages.success(request, "Se o usuário existir, receberá um email com instruções de recuperação.")
+        else:
+            # Não mostrar que o usuário não existe por segurança
+            messages.success(request, "Se o usuário existir, receberá um email com instruções de recuperação.")
+        
+        return redirect("boards:login")
+    
+    return render(request, "boards/password_reset.html")
+
+
+def password_reset_confirm_view(request, uidb36, token):
+    """Confirma reset de senha com token."""
+    if request.user.is_authenticated:
+        return redirect("boards:list")
+    
+    try:
+        user_id = int(uidb36)
+        user = User.objects.get(pk=user_id)
+    except (ValueError, User.DoesNotExist):
+        messages.error(request, "Link inválido ou expirado.")
+        return redirect("boards:login")
+    
+    from django.contrib.auth.tokens import default_token_generator
+    
+    if not default_token_generator.check_token(user, token):
+        messages.error(request, "Link inválido ou expirado.")
+        return redirect("boards:login")
+    
+    if request.method == "POST":
+        password1 = request.POST.get("password1", "")
+        password2 = request.POST.get("password2", "")
+        
+        if not password1 or not password2:
+            messages.error(request, "Ambas as senhas devem ser preenchidas.")
+        elif password1 != password2:
+            messages.error(request, "As senhas não correspondem.")
+        elif len(password1) < 6:
+            messages.error(request, "A senha deve ter no mínimo 6 caracteres.")
+        else:
+            # Usar validadores do Django
+            from django.contrib.auth.password_validation import validate_password
+            from django.core.exceptions import ValidationError
+            
+            try:
+                validate_password(password1, user)
+                user.set_password(password1)
+                user.save()
+                messages.success(request, "Senha alterada com sucesso! Agora você pode fazer login.")
+                return redirect("boards:login")
+            except ValidationError as e:
+                for error in e.messages:
+                    messages.error(request, str(error))
+    
+    return render(request, "boards/password_reset_confirm.html")
+
+
 @login_required
 def get_card_comments(request, card_id):
     """Retorna comentários de um card em formato JSON."""

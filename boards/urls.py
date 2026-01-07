@@ -13,6 +13,8 @@ from .views import (
     logout_view,
     profile_view,
     change_password_view,
+    password_reset_view,
+    password_reset_confirm_view,
     my_tasks_view,
     share_board,
     invite_member,
@@ -29,6 +31,8 @@ urlpatterns = [
     path("logout/", logout_view, name="logout"),
     path("profile/", profile_view, name="profile"),
     path("profile/password/", change_password_view, name="change_password"),
+    path("password-reset/", password_reset_view, name="password_reset"),
+    path("password-reset/<int:uidb36>/<str:token>/", password_reset_confirm_view, name="password_reset_confirm"),
     
     # Quadros
     path("", BoardListView.as_view(), name="list"),

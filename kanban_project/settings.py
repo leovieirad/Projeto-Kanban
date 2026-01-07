@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.sites',
     'boards.apps.BoardsConfig', 
 ]
 
@@ -133,3 +134,15 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 LOGIN_URL = 'boards:login'
 LOGIN_REDIRECT_URL = 'boards:list'
 LOGOUT_REDIRECT_URL = 'boards:login'
+
+# Configurações de Email (para recuperação de senha)
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'  # Console para desenvolvimento
+# Para produção, usar:
+# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+# EMAIL_HOST = 'seu-host-smtp.com'
+# EMAIL_PORT = 587
+# EMAIL_USE_TLS = True
+# EMAIL_HOST_USER = 'seu-email@example.com'
+# EMAIL_HOST_PASSWORD = 'sua-senha'
+
+SITE_ID = 1
